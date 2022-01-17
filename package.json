@@ -1,0 +1,31 @@
+{
+  "name": "vio-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ovillena/vio-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ovillena/vio-server/issues"
+  },
+  "homepage": "https://github.com/Ovillena/vio-server#readme",
+  "dependencies": {
+    "dotenv": "^14.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.14",
+    "prettier": "^2.4.1"
+  }
+}
