@@ -1,19 +1,6 @@
-//Define the include function for absolute file name
-global.base_dir = __dirname;
-global.abs_path = function (path) {
-    return base_dir + path;
-};
-global.include = function (file) {
-    return require(abs_path('/' + file));
-};
+const app = require('./app.js');
 
-process.on('uncaughtException', (err) => {
-    console.log('UNCAUGHT EXCEPTION!!! shutting down...');
-    console.log(err);
-    process.exit(1);
-});
-
-const app = require('./app');
+// Database setup
 
 // Start the server
 const port = process.env.PORT || 8080;
