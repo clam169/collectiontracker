@@ -20,7 +20,9 @@
   "homepage": "https://github.com/Ovillena/vio-server#readme",
   "dependencies": {
     "dotenv": "^14.2.0",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "knex": "^1.0.1",
+    "pg": "^8.7.1"
   },
   "devDependencies": {
     "eslint": "^8.1.0",
