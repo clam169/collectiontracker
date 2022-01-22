@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> } 
  */
-exports.seed = function(knex) {
+ exports.seed = function(knex) {
   // Deletes ALL existing entries
   return knex('things').del()
     .then(function () {
@@ -13,7 +13,8 @@ exports.seed = function(knex) {
       ('test tickles'),
       ('jo jo'),
       ('Megan'),
-      ('sara');
+      ('sara'),
+      ('ninja');
       `)
     });
 };         
