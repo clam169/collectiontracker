@@ -12,14 +12,13 @@ const pool = new Pool({
 module.exports = async function() {
   const client = await pool.connect()
 
-  async function testQuery(username) {
+  async function testQuery() {
     console.log("called testQuery")
     // need to update this if we change database for user account id
   
-    let sqlQuery = 'SELECT * FROM accounts WHERE username = $1';
-    let values = [username];
-    let user = await client.query(sqlQuery, values)
-    return user;
+    let sqlQuery = 'SELECT * FROM things';
+    let result = await client.query(sqlQuery)
+    return result.rows;
   }
   
   return {
