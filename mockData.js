@@ -82,14 +82,41 @@ module.exports = async function () {
   async function deleteEntry(entryId) {
     return { status: 200 };
   }
-  async function testQuery() {
-    return 'hello';
-  }
+  let mockEntry = [
+    {
+      formValues: {
+        date: '2021-01-22',
+        source_id: 1,
+      },
+      entryWeights: [
+        {
+          item_id: 1,
+          entry_weight: 10,
+        },
+        {
+          item_id: 2,
+          entry_weight: 15,
+        },
+        {
+          item_id: 3,
+          entry_weight: 30,
+        },
+      ],
+    },
+  ];
+  let editEntry = {
+    entry_id: 1,
+    item_id: 1,
+    source_id: 1,
+    entry_weight: 29,
+    entry_date: '2022-01-01',
+  };
   return {
     getSources,
-    testQuery,
+    editEntry,
     getItems,
     getListOfEntries,
     deleteEntry,
+    mockEntry,
   };
 };
