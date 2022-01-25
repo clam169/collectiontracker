@@ -10,9 +10,6 @@ module.exports = function (database) {
   // setup the route
   // start these with api
   app.get('/api/test', async (req, res) => {
-    const result = await database.testQuery('Whoe cares');
-    console.log(result);
-
     res.send({
       message: 'Happy Route :)',
     });
