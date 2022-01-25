@@ -6,13 +6,81 @@ module.exports = async function () {
       {
         source_id: 1,
         name: 'Cafe 1',
-        address: '',
       },
       {
         source_id: 2,
-        name: 'Cafe 3',
+        name: 'Cafe 2',
       },
     ];
+  }
+  async function getItems(accountId) {
+    return [
+      {
+        item_id: 1,
+        name: 'Paper Cups',
+      },
+      {
+        item_id: 2,
+        name: 'Coffee Grinds',
+      },
+      {
+        item_id: 3,
+        name: 'Coffee Lids',
+      },
+      {
+        item_id: 4,
+        name: 'Napkins',
+      },
+    ];
+  }
+  async function getListOfEntries(accountId) {
+    return [
+      {
+        item_name: 'Paper Cups',
+        source_name: 'Cafe 1',
+        entry_id: 1,
+        entry_date: '2022-01-22',
+        entry_weight: 10,
+      },
+      {
+        item_name: 'Coffee Grinds',
+        source_name: 'Cafe 1',
+        entry_id: 2,
+        entry_date: '2022-01-23',
+        entry_weight: 20,
+      },
+      {
+        item_name: 'Coffee Lids',
+        source_name: 'Cafe 1',
+        entry_id: 3,
+        entry_date: '2022-01-24',
+        entry_weight: 15,
+      },
+      {
+        item_name: 'Napkins',
+        source_name: 'Cafe 1',
+        entry_id: 4,
+        entry_date: '2022-01-24',
+        entry_weight: 5,
+      },
+      {
+        item_name: 'Paper Cups',
+        source_name: 'Cafe 2',
+        entry_id: 5,
+        entry_date: '2022-01-24',
+        entry_weight: 25,
+      },
+      {
+        item_name: 'Coffee Grinds',
+        source_name: 'Cafe 2',
+        entry_id: 6,
+        entry_date: '2022-01-24',
+        entry_weight: 20,
+      },
+    ];
+  }
+  async function deleteEntry(entryId) {
+    return { status: 200 };
   }
   async function testQuery() {
     return 'hello';
@@ -20,5 +88,8 @@ module.exports = async function () {
   return {
     getSources,
     testQuery,
+    getItems,
+    getListOfEntries,
+    deleteEntry,
   };
 };
