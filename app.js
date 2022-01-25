@@ -25,6 +25,13 @@ module.exports = function (database) {
     res.json(result);
   });
 
+  app.get('/api/getEntries', async (req, res) => {
+    const result = await database.getListOfEntries('account_id');
+    console.log(result);
+
+    res.json(result);
+  });
+
   // anything that hasn't been serverd through a route should be served by the react app
   // /idk/someroute/longroute
   app.get('*', (req, res) => {
