@@ -35,5 +35,10 @@ module.exports = function (database) {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 
+  //Routes
+  const entriesRouter = include('routes/entry');
+
+  app.use('/api/entries', entriesRouter);
+
   return app;
 };
