@@ -1,13 +1,18 @@
 module.exports = {
   validateInput: (req, res, next) => {
-    inputRequest = req.params[0];
+    inputRequest = req.body[0];
+    console.log(
+      '================================================',
+      inputRequest,
+      '================================================'
+    );
 
     //turn input date into date type
     const inputDate = new Date(inputRequest.formValues.date);
 
     //calculate week after today to check if input is for this week or before
     const weekAfterToday = new Date();
-    weekAfterToday.setDate(today.getDate() + 7);
+    weekAfterToday.setDate(weekAfterToday.getDate() + 7);
     switch (inputDate.getDate()) {
       case inputDate.getDate() < weekAfterToday.getDate():
         res.send('The Date is way ahead');
@@ -16,16 +21,17 @@ module.exports = {
     }
 
     //check entryWeights data
-    for (item in inputRequest.entryWeights) {
+    for (item of inputRequest.entryWeights) {
       //check if item_id is a number and is not negative
+      console.log('CCCCCCOOOOONSOOOLE', item);
       if (typeof item.item_id !== 'number' || item.item_id < 0) {
-        res.send('invalid item_id detected');
+        return res.send('invalid item_id detected');
       }
 
       //make sure weights entered are not negative
       switch (item.entry_weight) {
         case item.entry_weight < 0:
-          res.send('unable to input negative weight');
+          return res.send('unable to input negative weight');
       }
 
       return next();
