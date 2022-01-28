@@ -1,6 +1,6 @@
 module.exports = {
   validateInput: (req, res, next) => {
-    inputRequest = req.body[0];
+    inputRequest = req.body.data;
     console.log(
       '================================================',
       inputRequest,
