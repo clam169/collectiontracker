@@ -21,16 +21,16 @@ module.exports = {
     }
 
     //check entryWeights data
-    for (item of inputRequest.entryWeights) {
+    for (entry of inputRequest.entryWeights) {
       //check if item_id is a number and is not negative
-      console.log('CCCCCCOOOOONSOOOLE', item);
-      if (typeof item.item_id !== 'number' || item.item_id < 0) {
+      console.log('CCCCCCOOOOONSOOOLE', entry);
+      if (typeof entry.item !== 'number' || entry.item < 0) {
         return res.send('invalid item_id detected');
       }
 
       //make sure weights entered are not negative
-      switch (item.entry_weight) {
-        case item.entry_weight < 0:
+      switch (entry.weight) {
+        case entry.weight < 0:
           return res.send('unable to input negative weight');
       }
 

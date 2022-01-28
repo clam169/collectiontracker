@@ -47,7 +47,7 @@ module.exports = function (database) {
 
   // post request to input data. Just validates for now
   app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
-    res.send(`data looks acceptable!<br> ${JSON.stringify(req.body[0])}`);
+    res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
   ///////////////////////// Just realized that we might not use routes
