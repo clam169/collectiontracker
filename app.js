@@ -1,8 +1,11 @@
 const path = require('path');
 const express = require('express');
+const inputValidation = require('./middleware/inputValidation');
 
 module.exports = function (database) {
   const app = express();
+
+  app.use(express.json());
 
   // serve the react app if request to /
   app.use(express.static(path.join(__dirname, 'build')));
@@ -42,5 +45,16 @@ module.exports = function (database) {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 
+  // post request to input data. Just validates for now
+  app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
+    res.send(`data looks acceptable!<br> ${JSON.stringify(req.body[0])}`);
+  });
+
+  ///////////////////////// Just realized that we might not use routes
+  //   //Routes
+  //   const entriesRouter = require('./routes/entries');
+
+  //   app.use('/api/entries', entriesRouter);
+  ////////////////////////////////
   return app;
 };
