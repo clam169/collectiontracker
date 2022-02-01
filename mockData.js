@@ -79,6 +79,15 @@ module.exports = async function () {
       },
     ];
   }
+  async function getEntryById(entryId) {
+    return {
+      item_name: 'Coffee Grinds',
+      source_name: 'Cafe 2',
+      entry_id: 6,
+      entry_date: '2022-01-24',
+      entry_weight: 20,
+    };
+  }
   async function deleteEntry(entryId) {
     return { status: 200 };
   }
@@ -116,6 +125,7 @@ module.exports = async function () {
     editEntry,
     getItems,
     getListOfEntries,
+    getEntryById,
     deleteEntry,
     mockEntry,
   };
