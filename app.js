@@ -32,6 +32,14 @@ module.exports = function (database) {
     res.json(result);
   });
 
+  app.get('/api/getEntry/:id', async (req, res) => {
+    const entryId = req.params.id;
+    const result = await database.getEntryById(entryId);
+    console.log(result);
+
+    res.json(result);
+  });
+
   app.get('/api/items', async (req, res) => {
     const result = await database.getItems('account_id');
     console.log(result);
