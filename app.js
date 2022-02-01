@@ -32,7 +32,7 @@ module.exports = function (database) {
     res.json(result);
   });
 
-  app.get('/api/getEntry/:id', async (req, res) => {
+  app.get('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
     const result = await database.getEntryById(entryId);
     console.log(result);
