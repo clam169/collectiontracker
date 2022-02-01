@@ -88,8 +88,11 @@ module.exports = async function () {
       entry_weight: 20,
     };
   }
+  async function updateEntryById(entryId, updatedEntry) {
+    return { message: 'Successfully updated entry ' + entryId };
+  }
   async function deleteEntry(entryId) {
-    return { status: 200 };
+    return { message: 'Successfully deleted entry ' + entryId };
   }
   let mockEntry = [
     {
@@ -126,6 +129,7 @@ module.exports = async function () {
     getItems,
     getListOfEntries,
     getEntryById,
+    updateEntryById,
     deleteEntry,
     mockEntry,
   };

@@ -58,6 +58,15 @@ module.exports = function (database) {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
+  app.put('/api/entry/:id', async (req, res) => {
+    const entryId = req.params.id;
+    const updatedEntry = req.body.data;
+    const result = await database.updateEntryById(entryId, updatedEntry);
+    console.log(result);
+
+    res.json(result);
+  });
+
   ///////////////////////// Just realized that we might not use routes
   //   //Routes
   //   const entriesRouter = require('./routes/entries');
