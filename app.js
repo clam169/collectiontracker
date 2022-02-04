@@ -50,6 +50,26 @@ module.exports = function (database) {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
+  app.post('/api/deleteEntry', async (req, res) => {
+    database.deleteEntry(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.send(`entry ${req.params.entry_id} was deleted`);
+
+        //Output the results of the query to the Heroku Logs
+        // console.log('getEntriesByDateRangeAndType', result.rows);
+        console.log(
+          'deleteEntry --------------------------------',
+          req.params.startDate,
+          req.params.endDate
+        );
+      }
+    });
+  });
+
   ///////////////////////// Just realized that we might not use routes
   //   //Routes
   //   const entriesRouter = require('./routes/entries');

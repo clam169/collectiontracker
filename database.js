@@ -24,3 +24,17 @@ module.exports = async function () {
     testQuery,
   };
 };
+
+async function deleteEntry(postData, callback) {
+  const client = await pool.connect();
+  let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
+  console.log(sqlQuery);
+  client.query(sqlQuery, [postData.params.entry_id], (err, result) => {
+    if (err) {
+      callback(err, null);
+    }
+    console.log('--------------------------------');
+    console.log(result);
+    callback(null, result);
+  });
+}
