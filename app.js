@@ -49,10 +49,28 @@ module.exports = function (database) {
 
   app.get('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
-    const result = await database.getEntryById(entryId);
-    console.log(result);
+    const result = await database.getEntryById(entryId, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        console.log('this is from routes', result);
+        const entry = result.rows[0];
+        //success
+        res.json({
+          entryId: entry.entry_id,
+          itemId: entry.item_id,
+          sourceId: entry.source_id,
+          date: entry.date,
+          weight: entry.weight
+        });
+        // res.send(result.rows);
+      }
+    });
 
-    res.json(result);
+    // console.log(result);
+
+    // res.json(result);
   });
 
   app.put('/api/entry/:id', async (req, res) => {
