@@ -19,10 +19,19 @@ module.exports = function (database) {
 
   /** Source Routes **/
   app.get('/api/sources', async (req, res) => {
-    const result = await database.getSources('account_id');
-    console.log(result);
+    const result = await database.getSources(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json(result);
 
-    res.json(result);
+        //Output the results of the query to the Heroku Logs
+        console.log('get sources --------------------------------');
+      }
+    });
+    console.log(result);
   });
 
   /** Entry Routes **/
@@ -93,7 +102,7 @@ module.exports = function (database) {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
-  app.post('/api/deleteEntry', async (req, res) => {
+  app.delete('/api/entry/delete', async (req, res) => {
     database.deleteEntry(req, (err, result) => {
       if (err) {
         res.send('Error reading from PostgreSQL');
@@ -103,7 +112,6 @@ module.exports = function (database) {
         res.send(`entry ${req.body.entry_id} was deleted`);
 
         //Output the results of the query to the Heroku Logs
-        // console.log('getEntriesByDateRangeAndType', result.rows);
         console.log('deleteEntry --------------------------------');
       }
     });
