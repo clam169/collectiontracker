@@ -82,15 +82,11 @@ module.exports = function (database) {
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
-        res.send(`entry ${req.params.entry_id} was deleted`);
+        res.send(`entry ${req.body.entry_id} was deleted`);
 
         //Output the results of the query to the Heroku Logs
         // console.log('getEntriesByDateRangeAndType', result.rows);
-        console.log(
-          'deleteEntry --------------------------------',
-          req.params.startDate,
-          req.params.endDate
-        );
+        console.log('deleteEntry --------------------------------');
       }
     });
   });
