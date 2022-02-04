@@ -20,7 +20,24 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function getEntryById(entryId) {
+    console.log('called getEntryByID');
+    let sqlQuery = 'SELECT * FROM entry WHERE entry_id =$1';
+    let result = await client.query(sqlQuery, entryId);
+    return result.rows;
+    // return {
+    //   item_name: 'Coffee Grinds',
+    //   item_id: 2,
+    //   source_name: 'Cafe 2',
+    //   source_id: 2,
+    //   entry_id: 6,
+    //   entry_date: '2022-01-24',
+    //   entry_weight: 20,
+    // };
+  }
+
   return {
     testQuery,
+    getEntryById
   };
 };
