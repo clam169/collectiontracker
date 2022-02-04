@@ -20,11 +20,19 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function getEntryById(entryId) {
-    console.log('called getEntryByID');
-    let sqlQuery = 'SELECT * FROM entry WHERE entry_id =$1';
-    let result = await client.query(sqlQuery, entryId);
-    return result.rows;
+  async function getEntryById(entryId, callback) {
+      let sqlQuery = 'SELECT * FROM entry WHERE entry_id =$1';
+      console.log(`called getEntryByID for ${entryId}: `, sqlQuery);
+      let result = await client.query(sqlQuery, [entryId], (err, result) => {
+        if (err) {
+          callback(err, null);
+        }
+        console.log('--------------------------------');
+        // console.log(result);
+        callback(null, result);
+      });
+
+    return result;
     // return {
     //   item_name: 'Coffee Grinds',
     //   item_id: 2,
@@ -36,8 +44,22 @@ module.exports = async function () {
     // };
   }
 
+  async function deleteEntry(postData, callback) {
+    let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
+    console.log(sqlQuery, '$1 is ', postData.body.entry_id);
+    client.query(sqlQuery, [postData.body.entry_id], (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      console.log('--------------------------------');
+      console.log(result);
+      callback(null, result);
+    });
+  }
+
   return {
     testQuery,
-    getEntryById
+    getEntryById,
+    deleteEntry,
   };
 };

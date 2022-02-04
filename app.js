@@ -40,10 +40,28 @@ module.exports = function (database) {
 
   app.get('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
-    const result = await database.getEntryById(entryId);
-    console.log(result);
+    const result = await database.getEntryById(entryId, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        console.log('this is from routes', result);
+        const entry = result.rows[0];
+        //success
+        res.json({
+          entryId: entry.entry_id,
+          itemId: entry.item_id,
+          sourceId: entry.source_id,
+          date: entry.date,
+          weight: entry.weight
+        });
+        // res.send(result.rows);
+      }
+    });
 
-    res.json(result);
+    // console.log(result);
+
+    // res.json(result);
   });
 
   app.put('/api/entry/:id', async (req, res) => {
@@ -68,6 +86,27 @@ module.exports = function (database) {
   // /idk/someroute/longroute
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/build/index.html'));
+  });
+
+  // post request to input data. Just validates for now
+  app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
+    res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
+  });
+
+  app.post('/api/deleteEntry', async (req, res) => {
+    database.deleteEntry(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.send(`entry ${req.body.entry_id} was deleted`);
+
+        //Output the results of the query to the Heroku Logs
+        // console.log('getEntriesByDateRangeAndType', result.rows);
+        console.log('deleteEntry --------------------------------');
+      }
+    });
   });
 
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
