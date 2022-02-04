@@ -70,6 +70,27 @@ module.exports = function (database) {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 
+  // post request to input data. Just validates for now
+  app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
+    res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
+  });
+
+  app.post('/api/deleteEntry', async (req, res) => {
+    database.deleteEntry(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.send(`entry ${req.body.entry_id} was deleted`);
+
+        //Output the results of the query to the Heroku Logs
+        // console.log('getEntriesByDateRangeAndType', result.rows);
+        console.log('deleteEntry --------------------------------');
+      }
+    });
+  });
+
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
   //   //Routes
   //   const entriesRouter = require('./routes/entries');

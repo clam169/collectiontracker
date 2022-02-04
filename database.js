@@ -20,7 +20,21 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function deleteEntry(postData, callback) {
+    let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
+    console.log(sqlQuery, '$1 is ', postData.body.entry_id);
+    client.query(sqlQuery, [postData.body.entry_id], (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      console.log('--------------------------------');
+      console.log(result);
+      callback(null, result);
+    });
+  }
+
   return {
     testQuery,
+    deleteEntry,
   };
 };
