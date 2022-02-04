@@ -25,7 +25,7 @@ module.exports = function (database) {
     res.json(result);
   });
 
-  app.get('/api/getEntries', async (req, res) => {
+  app.get('/api/entries', async (req, res) => {
     const result = await database.getListOfEntries('account_id');
     console.log(result);
 
@@ -54,7 +54,7 @@ module.exports = function (database) {
   });
 
   // post request to input data. Just validates for now
-  app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
+  app.post('/api/entries', inputValidation.validateInput, async (req, res) => {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
