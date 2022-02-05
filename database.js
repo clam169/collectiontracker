@@ -11,13 +11,22 @@ const pool = new Pool({
 module.exports = async function () {
   const client = await pool.connect();
 
+  if (!client) {
+    console.log('WHY IS THERE NO CLIENT');
+  } else {
+    console.log('there is a client');
+  }
+
   async function testQuery() {
     console.log('called testQuery');
     // need to update this if we change database for user account id
 
     let sqlQuery = 'SELECT * FROM things';
-    let result = await client.query(sqlQuery);
-    return result.rows;
+    let result = await client
+      .query(sqlQuery)
+      .catch((err) => console.log('ERRROROROOROR', err));
+    // return result.rows;
+    return 'hellloooo';
   }
 
   async function getEntryById(entryId, callback) {
@@ -32,7 +41,7 @@ module.exports = async function () {
       callback(null, result);
     });
 
-    return result;
+    // return result;
     // return {
     //   item_name: 'Coffee Grinds',
     //   item_id: 2,
@@ -46,6 +55,21 @@ module.exports = async function () {
       let sqlQuery = `SELECT cx_source.source_id, name FROM public.cx_source
     JOIN source ON cx_source.source_id = source.source_id
     WHERE cx_account_id = $1;`;
+      console.log(sqlQuery, '$1 is ', postData.body.account_id);
+      client.query(sqlQuery, [postData.body.account_id], (err, result) => {
+        if (err) {
+          callback(err, null);
+        }
+        console.log('--------------------------------');
+        console.log(result);
+        callback(null, result.rows);
+      });
+    }
+
+    async function getItems(postData, callback) {
+      let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
+      JOIN item ON account_item.item_id = item.item_id
+      WHERE account_id = $1;`;
       console.log(sqlQuery, '$1 is ', postData.body.account_id);
       client.query(sqlQuery, [postData.body.account_id], (err, result) => {
         if (err) {
@@ -74,7 +98,8 @@ module.exports = async function () {
       testQuery,
       getEntryById,
       getSources,
+      getItems,
       deleteEntry,
     };
-  };
-}
+  }
+};

@@ -12,8 +12,13 @@ module.exports = function (database) {
 
   /** Test Route **/
   app.get('/api/test', async (req, res) => {
+    if (!database) {
+      res.send({ message: 'fuck me' });
+    }
+    const result = await database.testQuery();
     res.send({
       message: 'Teapot Test',
+      result: result,
     });
   });
 
@@ -32,6 +37,25 @@ module.exports = function (database) {
       }
     });
     console.log(result);
+  });
+
+  /** Item Routes **/
+  app.get('/api/items', async (req, res) => {
+    const result = await database.getItems(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json(result);
+
+        //Output the results of the query to the Heroku Logs
+        console.log('get sources --------------------------------');
+      }
+    });
+    console.log(result);
+
+    res.json(result);
   });
 
   /** Entry Routes **/
@@ -62,7 +86,7 @@ module.exports = function (database) {
           itemId: entry.item_id,
           sourceId: entry.source_id,
           date: entry.date,
-          weight: entry.weight
+          weight: entry.weight,
         });
         // res.send(result.rows);
       }
@@ -77,14 +101,6 @@ module.exports = function (database) {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     const result = await database.updateEntryById(entryId, updatedEntry);
-    console.log(result);
-
-    res.json(result);
-  });
-
-  /** Item Routes **/
-  app.get('/api/items', async (req, res) => {
-    const result = await database.getItems('account_id');
     console.log(result);
 
     res.json(result);
