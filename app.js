@@ -39,6 +39,22 @@ module.exports = function (database) {
     console.log(result);
   });
 
+  //get connected sources??
+  app.get('/api/sourceList', async (req, res) => {
+    //change 1 to account id after we can log in
+    const result = await database.getCxSources(1, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json(result);
+        console.log('get source list~~~~~~~~~~~~~~');
+      }
+    });
+    console.log(result);
+  });
+
   /** Item Routes **/
   app.get('/api/items', async (req, res) => {
     const result = await database.getItems(req, (err, result) => {
@@ -97,6 +113,7 @@ module.exports = function (database) {
     // res.json(result);
   });
 
+  //updates an entry
   app.put('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
     const updatedEntry = req.body;

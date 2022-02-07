@@ -87,6 +87,21 @@ module.exports = async function () {
     });
   }
 
+  // get list of cx connected sources
+  async function getCxSources(accountId, callback) {
+    let sqlQuery = `SELECT name, address, phone_number FROM cx_source
+    INNER JOIN source ON cx_source.source_id = source.source_id
+    WHERE cx_account_id = $1;`;
+    client.query(sqlQuery, [accountId], (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      console.log('--------------------------------');
+      console.log(result);
+      callback(null, result.rows);
+    });
+  }
+
   async function getItems(postData, callback) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
@@ -122,5 +137,6 @@ module.exports = async function () {
     getItems,
     deleteEntry,
     updateEntryById,
+    getCxSources,
   };
 };
