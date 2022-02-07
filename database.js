@@ -76,7 +76,25 @@ module.exports = async function () {
         callback(err, null);
       }
       console.log('--------------------------------');
-      console.log(result);
+      console.log(result.rows);
+      callback(null, result.rows);
+    });
+  }
+
+  async function getListOfEntries(postData, callback) {
+    let sqlQuery = `SELECT item.name AS item_name, source.name AS source_name, entry_id, 
+    created AS entry_date, weight AS entry_weight
+    FROM entry 
+    JOIN item ON entry.item_id = item.item_id 
+    JOIN source ON entry.source_id = source.source_id
+    WHERE entry_id = $1;`;
+    console.log(sqlQuery, '$1 is ', postData.body.account_id);
+    client.query(sqlQuery, [postData.body.account_id], (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      console.log('--------------------------------');
+      console.log(result.rows);
       callback(null, result.rows);
     });
   }
@@ -99,6 +117,7 @@ module.exports = async function () {
     getEntryById,
     getSources,
     getItems,
+    getListOfEntries,
     deleteEntry,
   };
 };

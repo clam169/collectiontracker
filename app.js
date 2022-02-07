@@ -36,7 +36,6 @@ module.exports = function (database) {
         console.log('get sources --------------------------------');
       }
     });
-    console.log(result);
   });
 
   /** Item Routes **/
@@ -50,20 +49,25 @@ module.exports = function (database) {
         res.json(result);
 
         //Output the results of the query to the Heroku Logs
-        console.log('get sources --------------------------------');
+        console.log('get items --------------------------------');
       }
     });
-    console.log(result);
-
-    res.json(result);
   });
 
   /** Entry Routes **/
   app.get('/api/entries', async (req, res) => {
-    const result = await database.getListOfEntries('account_id');
-    console.log(result);
+    const result = await database.getListOfEntries(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json(result);
 
-    res.json(result);
+        //Output the results of the query to the Heroku Logs
+        console.log('get List of Entries --------------------------------');
+      }
+    });
   });
 
   // post request to input data. Just validates for now
