@@ -85,7 +85,7 @@ module.exports = function (database) {
           entryId: entry.entry_id,
           itemId: entry.item_id,
           sourceId: entry.source_id,
-          date: entry.date,
+          date: entry.created,
           weight: entry.weight,
         });
         // res.send(result.rows);
@@ -99,11 +99,25 @@ module.exports = function (database) {
 
   app.put('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
-    const updatedEntry = req.body.data;
-    const result = await database.updateEntryById(entryId, updatedEntry);
-    console.log(result);
+    const updatedEntry = req.body;
+    const result = await database.updateEntryById(
+      entryId,
+      updatedEntry,
+      (err, result) => {
+        if (err) {
+          res.send('Error with updating');
+          console.log('Something went wrong :(', err);
+        } else {
+          console.log(
+            `updating worked! but it seems like the results below are useless`
+          );
+          console.log(result);
 
-    res.json(result);
+          //not sure we should be res.json(result) x-x
+          res.json(result);
+        }
+      }
+    );
   });
 
   /** Render pages **/

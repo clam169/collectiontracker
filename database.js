@@ -51,6 +51,27 @@ module.exports = async function () {
   //   entry_date: '2022-01-24',
   //   entry_weight: 20,
   // };
+
+  async function updateEntryById(entryId, postData, callback) {
+    let sqlQuery = `UPDATE entry SET item_id = $1, source_id = $2, weight = $3, created = $4
+     WHERE entry_id = $5`;
+    let params = [
+      postData.itemId,
+      postData.sourceId,
+      postData.weight,
+      postData.date,
+      entryId,
+    ];
+    await client.query(sqlQuery, params, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      console.log('--------------------------------');
+      // console.log(result);
+      callback(null, result);
+    });
+  }
+
   async function getSources(postData, callback) {
     let sqlQuery = `SELECT cx_source.source_id, name FROM public.cx_source
     JOIN source ON cx_source.source_id = source.source_id
@@ -100,5 +121,6 @@ module.exports = async function () {
     getSources,
     getItems,
     deleteEntry,
+    updateEntryById,
   };
 };
