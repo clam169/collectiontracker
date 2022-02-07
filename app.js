@@ -70,6 +70,21 @@ module.exports = function (database) {
     });
   });
 
+  app.get('/api/entries/id', async (req, res) => {
+    const result = await database.getEntryById(req, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json(result);
+
+        //Output the results of the query to the Heroku Logs
+        console.log('get entry by ID --------------------------------');
+      }
+    });
+  });
+
   // post request to input data. Just validates for now
   app.post('/api/entries', inputValidation.validateInput, async (req, res) => {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
