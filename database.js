@@ -69,7 +69,7 @@ module.exports = async function () {
   async function getItems(postData, callback) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
-      WHERE account_id = $1;`;
+      WHERE account_item.account_id = $1;`;
     console.log(sqlQuery, '$1 is ', postData.body.account_id);
     client.query(sqlQuery, [postData.body.account_id], (err, result) => {
       if (err) {
@@ -87,7 +87,7 @@ module.exports = async function () {
     FROM entry 
     JOIN item ON entry.item_id = item.item_id 
     JOIN source ON entry.source_id = source.source_id
-    WHERE account_id = $1;`;
+    WHERE entry.account_id = $1;`;
     console.log(sqlQuery, '$1 is ', postData.body.account_id);
     client.query(sqlQuery, [postData.body.account_id], (err, result) => {
       if (err) {
@@ -106,7 +106,7 @@ module.exports = async function () {
     FROM entry 
     JOIN item ON entry.item_id = item.item_id 
     JOIN source ON entry.source_id = source.source_id
-    WHERE entry_id = $1;`;
+    WHERE entry.entry_id = $1;`;
     console.log(sqlQuery, '$1 is ', postData.body.entry_id);
     client.query(sqlQuery, [postData.body.entry_id], (err, result) => {
       if (err) {
