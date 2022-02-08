@@ -23,19 +23,6 @@ module.exports = async function () {
     return 'hellloooo';
   }
 
-  async function getEntryById(entryId, callback) {
-    let sqlQuery = 'SELECT * FROM entry WHERE entry_id =$1';
-    console.log(`called getEntryByID for ${entryId}: `, sqlQuery);
-    let result = await client.query(sqlQuery, [entryId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      }
-      console.log('--------------------------------');
-      // console.log(result);
-      callback(null, result);
-    });
-  }
-
   async function updateEntryById(entryId, postData, callback) {
     const editDate = new Date();
     let sqlQuery = `UPDATE entry SET item_id = $1, source_id = $2, weight = $3, created = $4, last_edit = $5
@@ -66,10 +53,11 @@ module.exports = async function () {
     client.query(sqlQuery, [accountId], (err, result) => {
       if (err) {
         callback(err, null);
+      } else {
+        console.log('--------------------------------');
+        console.log('Sources', result.rows);
+        callback(null, result.rows);
       }
-      console.log('--------------------------------');
-      console.log('Sources', result);
-      callback(null, result.rows);
     });
   }
 
@@ -81,10 +69,11 @@ module.exports = async function () {
     client.query(sqlQuery, [accountId], (err, result) => {
       if (err) {
         callback(err, null);
+      } else {
+        console.log('-----------GET ITEMS---------------------');
+        console.log('items', result.rows);
+        callback(null, result.rows);
       }
-      console.log('-----------GET ITEMS---------------------');
-      console.log('items', result);
-      callback(null, result.rows);
     });
   }
 
@@ -95,14 +84,15 @@ module.exports = async function () {
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
     WHERE entry.account_id = $1;`;
-    console.log(sqlQuery, '$1 is ', accountId);
+    console.log('listofentries $1 is ', accountId);
     client.query(sqlQuery, [accountId], (err, result) => {
       if (err) {
         callback(err, null);
+      } else {
+        console.log('--------------------------------');
+        console.log(result.rows);
+        callback(null, result.rows);
       }
-      console.log('--------------------------------');
-      console.log(result.rows);
-      callback(null, result.rows);
     });
   }
 
@@ -114,14 +104,15 @@ module.exports = async function () {
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
     WHERE entry.entry_id = $1;`;
-    console.log(sqlQuery, '$1 is ', entryId);
+    console.log('entrybyid $1 is ', entryId);
     client.query(sqlQuery, [entryId], (err, result) => {
       if (err) {
         callback(err, null);
+      } else {
+        console.log('--------------------------------');
+        console.log('single entry request', result.rows);
+        callback(null, result.rows);
       }
-      console.log('--------------------------------');
-      console.log(result.rows);
-      callback(null, result.rows);
     });
   }
 
@@ -131,10 +122,11 @@ module.exports = async function () {
     client.query(sqlQuery, [entryId], (err, result) => {
       if (err) {
         callback(err, null);
+      } else {
+        console.log('--------------------------------');
+        console.log(result);
+        callback(null, result);
       }
-      console.log('--------------------------------');
-      console.log(result);
-      callback(null, result);
     });
   }
 
