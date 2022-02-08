@@ -59,6 +59,7 @@ exports.seed = function (knex) {
       {
         name: 'Cafe 3',
         address: '789 whatever street, van, bc',
+        phone_number: null,
         account_id: 1,
       },
     ]),
