@@ -79,8 +79,22 @@ module.exports = async function () {
       },
     ];
   }
+  async function getEntryById(entryId) {
+    return {
+      item_name: 'Coffee Grinds',
+      item_id: 2,
+      source_name: 'Cafe 2',
+      source_id: 2,
+      entry_id: 6,
+      entry_date: '2022-01-24',
+      entry_weight: 20,
+    };
+  }
+  async function updateEntryById(entryId, updatedEntry) {
+    return { message: 'Successfully updated entry ' + entryId };
+  }
   async function deleteEntry(entryId) {
-    return { status: 200 };
+    return { message: 'Successfully deleted entry ' + entryId };
   }
   let mockEntry = [
     {
@@ -116,6 +130,8 @@ module.exports = async function () {
     editEntry,
     getItems,
     getListOfEntries,
+    getEntryById,
+    updateEntryById,
     deleteEntry,
     mockEntry,
   };
