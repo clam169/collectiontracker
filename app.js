@@ -135,7 +135,7 @@ module.exports = function (database) {
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
-        res.json({message: `entry ${entryId} was deleted`});
+        res.json({ message: `entry ${entryId} was deleted` });
         //Output the results of the query to the Heroku Logs
         console.log('deleteEntry --------------------------------');
       }
@@ -148,8 +148,6 @@ module.exports = function (database) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
-
-
 
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
   //   //Routes
