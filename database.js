@@ -94,7 +94,8 @@ module.exports = async function () {
     FROM entry
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
-    WHERE entry.account_id = $1;`;
+    WHERE entry.account_id = $1
+    ORDER by CREATED desc, entry_id desc;`;
     console.log(sqlQuery, '$1 is ', accountId);
     client.query(sqlQuery, [accountId], (err, result) => {
       if (err) {
