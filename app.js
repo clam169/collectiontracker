@@ -23,27 +23,12 @@ module.exports = function (database) {
   });
 
   /** Source Routes **/
+  // getting all the sources associated with the logged in user
   app.get('/api/sources', async (req, res) => {
-    const result = await database.getSources(req, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-
-        //Output the results of the query to the Heroku Logs
-        console.log('get sources --------------------------------');
-      }
-    });
-  });
-
-  //get connected sources??
-  app.get('/api/sourceList', async (req, res) => {
     //change 1 to account id after we can log in
-    const result = await database.getCxSources(1, (err, result) => {
+    await database.getSources(1, (err, result) => {
       if (err) {
-        res.send('Error reading from PostgreSQL');
+        res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
@@ -51,109 +36,111 @@ module.exports = function (database) {
         console.log('get source list~~~~~~~~~~~~~~');
       }
     });
-    console.log(result);
+  });
+
+  // TODO: post request to add a new source to this Cx account
+  app.post('/api/sources', async (req, res) => {
+    res.send(`New source to be added`);
   });
 
   /** Item Routes **/
+  // get the list of items associated with this account
   app.get('/api/items', async (req, res) => {
-    const result = await database.getItems(req, (err, result) => {
+    //change 1 to account id after we can log in
+    await database.getItems(1, (err, result) => {
       if (err) {
-        res.send('Error reading from PostgreSQL');
+        res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
         res.json(result);
-
         //Output the results of the query to the Heroku Logs
         console.log('get items --------------------------------');
       }
     });
   });
 
+  // TODO: post request to input data. Just validates for now
+  app.post('/api/items', async (req, res) => {
+    res.send(`New item to be added`);
+  });
+
   /** Entry Routes **/
+  // get the list of entries made by that account
   app.get('/api/entries', async (req, res) => {
-    const result = await database.getListOfEntries(req, (err, result) => {
+    //change 1 to account id after we can log in
+    await database.getListOfEntries(1, (err, result) => {
       if (err) {
-        res.send('Error reading from PostgreSQL');
+        res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
         res.json(result);
-
         //Output the results of the query to the Heroku Logs
         console.log('get List of Entries --------------------------------');
       }
     });
   });
 
-  app.get('/api/entries/id', async (req, res) => {
-    const result = await database.getEntryById(req, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-
-        //Output the results of the query to the Heroku Logs
-        console.log('get entry by ID --------------------------------');
-      }
-    });
-  });
-
-  // post request to input data. Just validates for now
+  // TODO: post request to input new entries. Just validates for now
   app.post('/api/entries', inputValidation.validateInput, async (req, res) => {
     res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
+  // get a single entry for displaying that entry's info
   app.get('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
-    const result = await database.getEntryById(entryId, (err, result) => {
+    await database.getEntryById(entryId, (err, result) => {
       if (err) {
         res.send('Error reading from PostgreSQL');
         console.log('Error reading from PostgreSQL', err);
       } else {
         console.log('this is from routes', result);
-        const entry = result.rows[0];
+        const entry = result[0];
         //success
-        res.json({
-          entryId: entry.entry_id,
-          itemId: entry.item_id,
-          sourceId: entry.source_id,
-          date: entry.created,
-          weight: entry.weight,
-        });
-        // res.send(result.rows);
+        res.send(entry);
+        // option to change the styling of the data to a more common JSON format
+        // res.json({
+        //   entryId: entry.entry_id,
+        //   itemId: entry.item_id,
+        //   sourceId: entry.source_id,
+        //   date: entry.created,
+        //   weight: entry.weight,
+        // });
       }
     });
-
-    // console.log(result);
-
-    // res.json(result);
   });
 
-  //updates an entry
+  //updates an entry with new data
   app.put('/api/entry/:id', async (req, res) => {
     const entryId = req.params.id;
-    const updatedEntry = req.body;
-    const result = await database.updateEntryById(
-      entryId,
-      updatedEntry,
-      (err, result) => {
-        if (err) {
-          res.send('Error with updating');
-          console.log('Something went wrong :(', err);
-        } else {
-          console.log(
-            `updating worked! but it seems like the results below are useless`
-          );
-          console.log(result);
-
-          //not sure we should be res.json(result) x-x
-          res.json(result);
-        }
+    const updatedEntry = req.body.data;
+    console.log('updatedEntry', updatedEntry);
+    await database.updateEntryById(entryId, updatedEntry, (err, result) => {
+      if (err) {
+        console.log('Something went wrong :(', err);
+        res.json({ message: 'Error updating' });
+      } else {
+        console.log(`updating worked!`);
+        // send back confirmation
+        res.json({ message: 'Update successful' });
       }
-    );
+    });
+  });
+
+  app.delete('/api/entry/:id', async (req, res) => {
+    const entryId = req.params.id;
+    database.deleteEntry(entryId, (err, result) => {
+      if (err) {
+        res.send('Error reading from PostgreSQL');
+        console.log('Error reading from PostgreSQL', err);
+      } else {
+        //success
+        res.json({message: `entry ${entryId} was deleted`});
+        //Output the results of the query to the Heroku Logs
+        console.log('deleteEntry --------------------------------');
+      }
+    });
   });
 
   /** Render pages **/
@@ -163,25 +150,7 @@ module.exports = function (database) {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
 
-  // post request to input data. Just validates for now
-  app.post('/api/addItems', inputValidation.validateInput, async (req, res) => {
-    res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
-  });
 
-  app.delete('/api/entry/delete', async (req, res) => {
-    database.deleteEntry(req, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.send(`entry ${req.body.entry_id} was deleted`);
-
-        //Output the results of the query to the Heroku Logs
-        console.log('deleteEntry --------------------------------');
-      }
-    });
-  });
 
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
   //   //Routes
