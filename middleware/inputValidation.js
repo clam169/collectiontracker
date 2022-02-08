@@ -39,25 +39,3 @@ module.exports = {
     // if(typeof(inputRequest.entryWeights.))//todo: loop through entry weight
   },
 };
-//  let mockEntry = [
-//     {
-//       formValues: {
-//         date: '2021-01-22',
-//         source_id: 1,
-//       },
-//       entryWeights: [
-//         {
-//           item_id: 1,
-//           entry_weight: 10,
-//         },
-//         {
-//           item_id: 2,
-//           entry_weight: 15,
-//         },
-//         {
-//           item_id: 3,
-//           entry_weight: 30,
-//         },
-//       ],
-//     },
-//   ];
