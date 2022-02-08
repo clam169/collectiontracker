@@ -1,5 +1,7 @@
 const { Pool } = require('pg');
 
+const { sqlValues } = require('./databaseHelpers');
+
 const pool = new Pool({
   host: process.env.PG_HOST,
   user: process.env.PG_USER,
@@ -138,6 +140,30 @@ module.exports = async function () {
     });
   }
 
+  const addEntries = async (entries, accountId) => {
+    function arrayFromEntry(entry) {
+      // (account_id, source_id, item_id, weight, created, last_edit)
+      return [
+        accountId,
+        entry.source_id,
+        entry.item_id,
+        entry.weight,
+        entry.created,
+        entry.created,
+      ];
+    }
+    const inputValues = entries.map(arrayFromEntry);
+
+    const valuesData = sqlValues(inputValues);
+
+    const sqlQuery = `INSERT into entry
+    (account_id, source_id, item_id, weight, created, last_edit)
+    ${valuesData.sql}`;
+
+    let result = await client.query(sqlQuery, valuesData.values);
+    return result;
+  };
+
   return {
     testQuery,
     getEntryById,
@@ -146,5 +172,6 @@ module.exports = async function () {
     getListOfEntries,
     deleteEntry,
     updateEntryById,
+    addEntries,
   };
 };

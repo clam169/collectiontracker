@@ -61,7 +61,7 @@ module.exports = function (database) {
   });
 
   // TODO: post request to input data. Just validates for now
-  app.post('/api/items', async (req, res) => {
+  app.post('/api/items', async (req, res, next) => {
     res.send(`New item to be added`);
   });
 
@@ -80,11 +80,6 @@ module.exports = function (database) {
         console.log('get List of Entries --------------------------------');
       }
     });
-  });
-
-  // TODO: post request to input new entries. Just validates for now
-  app.post('/api/entries', inputValidation.validateInput, async (req, res) => {
-    res.send(`data looks acceptable! ${JSON.stringify(req.body.data)}`);
   });
 
   // get a single entry for displaying that entry's info
@@ -136,11 +131,23 @@ module.exports = function (database) {
         console.log('Error reading from PostgreSQL', err);
       } else {
         //success
-        res.json({message: `entry ${entryId} was deleted`});
+        res.json({ message: `entry ${entryId} was deleted` });
         //Output the results of the query to the Heroku Logs
         console.log('deleteEntry --------------------------------');
       }
     });
+  });
+
+  app.post('/api/entries', async (req, res) => {
+    const accountId = 2;
+    const { entries } = req.body;
+
+    try {
+      await database.addEntries(entries, accountId);
+      res.send({});
+    } catch (error) {
+      res.status(500).send({ error });
+    }
   });
 
   /** Render pages **/
@@ -149,8 +156,6 @@ module.exports = function (database) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
-
-
 
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
   //   //Routes
