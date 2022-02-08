@@ -95,7 +95,6 @@ module.exports = function (database) {
         res.send('Error reading from PostgreSQL');
         console.log('Error reading from PostgreSQL', err);
       } else {
-        console.log('this is from routes', result);
         const entry = result[0];
         //success
         res.send(entry);
