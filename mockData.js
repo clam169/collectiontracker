@@ -1,4 +1,7 @@
 module.exports = async function () {
+  async function testQuery() {
+    return []
+  }
   // user wants to select where the material is sourced from from a list of options
   // options MAY have an account attached to it OR it may be a string
   async function getSources(accountId) {
@@ -134,5 +137,6 @@ module.exports = async function () {
     updateEntryById,
     deleteEntry,
     mockEntry,
+    testQuery,
   };
 };
