@@ -146,6 +146,7 @@ module.exports = function (database) {
       await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
+      console.error(error);
       res.status(500).send({ error });
     }
   });
