@@ -138,7 +138,7 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', async (req, res) => {
-    const accountId = 2;
+    const accountId = 1;
     const { entries } = req.body;
 
     try {
