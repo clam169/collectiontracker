@@ -1,25 +1,38 @@
 const path = require('path');
 const express = require('express');
 const inputValidation = require('./middleware/inputValidation');
+const authConfig = require('./auth');
+const { requiresAuth } = require('express-openid-connect');
+const checkAuth = require('./middleware/authentication');
 
 module.exports = function (database) {
   const app = express();
 
   app.use(express.json());
+  app.use(authConfig);
 
   // serve the react app if request to /
   app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
   app.get('/api/test', async (req, res) => {
-    if (!database) {
-      res.send({ message: 'fuck me' });
-    }
+    const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
     const result = await database.testQuery();
     res.send({
+      userStatus: userStatus,
       message: 'Teapot Test',
       result: result,
     });
+  });
+
+  app.post('/callback', (req, res) => {
+    // store user in the database if doesnt already exist
+    const { id_token, state } = req.body;
+    res.send({ id_token, state });
+  });
+
+  app.get('/api/profile', checkAuth, (req, res) => {
+    res.send({ ...req.oidc?.user });
   });
 
   /** Source Routes **/
