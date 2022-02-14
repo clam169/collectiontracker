@@ -150,6 +150,22 @@ module.exports = function (database) {
     }
   });
 
+  app.get(
+    '/api/graph/',
+    async(req, (res) => {
+      const accountId = 1;
+      try {
+        const stuffThatGraphLibraryNeeds = await database.SOMETHING(
+          accountId
+        );
+        res.send({});
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ error });
+      }
+    })
+  );
+
   /** Render pages **/
   // anything that hasn't been serverd through a route should be served by the react app
   // /idk/someroute/longroute
