@@ -25,6 +25,24 @@ module.exports = async function () {
     return 'hellloooo';
   }
 
+  async function createAccount(auth0Id) {
+    console.log('created account!!!!!');
+    // let result = await client.query(
+    //   'SELECT * FROM account where auth0_id = $1',
+    //   [auth0Id]
+    // );
+    // if (result.rows[0]) {
+    //   return result.rows[0];
+    // }
+
+    // await client.query('INSERT INTO account (auth0_id) VALUES ($1)', [auth0Id]);
+
+    // result = await client.query('SELECT * FROM account where auth0_id = $1', [
+    //   auth0Id,
+    // ]);
+    // return result.rows[0];
+  }
+
   async function updateEntryById(entryId, postData, callback) {
     const editDate = new Date();
     let sqlQuery = `UPDATE entry SET item_id = $1, source_id = $2, weight = $3, created = $4, last_edit = $5
@@ -166,5 +184,6 @@ module.exports = async function () {
     deleteEntry,
     updateEntryById,
     addEntries,
+    createAccount,
   };
 };

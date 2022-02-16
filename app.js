@@ -1,44 +1,86 @@
 const path = require('path');
 const express = require('express');
 const inputValidation = require('./middleware/inputValidation');
-const authConfig = require('./auth');
 const { requiresAuth } = require('express-openid-connect');
 const checkAuth = require('./middleware/authentication');
+const { auth } = require('express-openid-connect');
+const jwt_decode = require('jwt-decode');
+
+const authConfig = require('./auth');
 
 module.exports = function (database) {
   const app = express();
 
   app.use(express.json());
-  app.use(authConfig);
+
+  // after login
+  authConfig.afterCallback = (req, res, session) => {
+    const claims = jwt_decode(session.id_token);
+
+    const {
+      given_name,
+      family_name,
+      nickname,
+      name,
+      picture,
+      locale,
+      updated_at,
+      email,
+      email_verified,
+      iss,
+      sub,
+      aud,
+      iat,
+      exp,
+      nonce,
+    } = claims;
+
+    console.log(sub);
+
+    // select * from users where auth0_id = sub
+    // if no user is returned then
+    // insert into users (auth0_id) values (sub)
+    // now you have a user in the database
+    database.createAccount(sub);
+
+    return session;
+  };
+
+  app.use(auth(authConfig));
 
   // serve the react app if request to /
   app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
-  app.get('/api/test', async (req, res) => {
-    const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
+  app.get('/api/test', checkAuth, async (req, res) => {
+    // const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
     const result = await database.testQuery();
     res.send({
-      userStatus: userStatus,
+      // userStatus: userStatus,
       message: 'Teapot Test',
       result: result,
     });
   });
 
-  app.post('/callback', (req, res) => {
-    // store user in the database if doesnt already exist
-    const { id_token, state } = req.body;
-    res.send({ id_token, state });
-  });
+  /** Auth Route **/
 
   app.get('/api/profile', checkAuth, (req, res) => {
+    const auth0Id = req.oidc?.user?.sub;
+    if (auth0Id) {
+      // idk something went wrong don't know how so maybe no need for a check
+    }
+    // select * from account where auth0_id = auth0Id
+    // returns the user object
     res.send({ ...req.oidc?.user });
   });
 
+
   /** Source Routes **/
   // getting all the sources associated with the logged in user
-  app.get('/api/sources', async (req, res) => {
+  app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
+    // const auth0Id = req.oidc?.user?.sub;
+
     await database.getSources(1, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
@@ -52,13 +94,13 @@ module.exports = function (database) {
   });
 
   // TODO: post request to add a new source to this Cx account
-  app.post('/api/sources', async (req, res) => {
+  app.post('/api/sources', checkAuth, async (req, res) => {
     res.send(`New source to be added`);
   });
 
   /** Item Routes **/
   // get the list of items associated with this account
-  app.get('/api/items', async (req, res) => {
+  app.get('/api/items', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
     await database.getItems(1, (err, result) => {
       if (err) {
@@ -74,13 +116,13 @@ module.exports = function (database) {
   });
 
   // TODO: post request to input data. Just validates for now
-  app.post('/api/items', async (req, res, next) => {
+  app.post('/api/items', checkAuth, async (req, res, next) => {
     res.send(`New item to be added`);
   });
 
   /** Entry Routes **/
   // get the list of entries made by that account
-  app.get('/api/entries', async (req, res) => {
+  app.get('/api/entries', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
     await database.getListOfEntries(1, (err, result) => {
       if (err) {
@@ -96,7 +138,7 @@ module.exports = function (database) {
   });
 
   // get a single entry for displaying that entry's info
-  app.get('/api/entry/:id', async (req, res) => {
+  app.get('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     await database.getEntryById(entryId, (err, result) => {
       if (err) {
@@ -119,7 +161,7 @@ module.exports = function (database) {
   });
 
   //updates an entry with new data
-  app.put('/api/entry/:id', async (req, res) => {
+  app.put('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     console.log('updatedEntry', updatedEntry);
@@ -135,7 +177,7 @@ module.exports = function (database) {
     });
   });
 
-  app.delete('/api/entry/:id', async (req, res) => {
+  app.delete('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     database.deleteEntry(entryId, (err, result) => {
       if (err) {
@@ -150,7 +192,7 @@ module.exports = function (database) {
     });
   });
 
-  app.post('/api/entries', async (req, res) => {
+  app.post('/api/entries', checkAuth, async (req, res) => {
     const accountId = 1;
     const { entries } = req.body;
 

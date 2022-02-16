@@ -1,4 +1,3 @@
-const { auth } = require('express-openid-connect');
 require('dotenv').config();
 
 const config = {
@@ -10,4 +9,4 @@ const config = {
   issuerBaseURL: process.env.AUTH0_BASE_URL,
 };
 
-module.exports = auth(config);
+module.exports = config;
