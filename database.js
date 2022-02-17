@@ -13,6 +13,8 @@ const pool = new Pool({
 module.exports = async function () {
   const client = await pool.connect();
 
+  const auth = 'auth0|62070daf94fb2700687ca3b3';
+
   async function testQuery() {
     console.log('called testQuery');
     // need to update this if we change database for user account id
@@ -109,7 +111,7 @@ module.exports = async function () {
     JOIN account ON entry.account_id = account.account_id
     WHERE account.auth0_id = $1
     ORDER by CREATED desc, entry_id desc;`;
-    console.log(sqlQuery, '$1 is ', accountId);
+    // console.log(sqlQuery, '$1 is ', accountId);
     client.query(sqlQuery, [auth0Id], (err, result) => {
       if (err) {
         callback(err, null);

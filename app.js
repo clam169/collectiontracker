@@ -13,6 +13,8 @@ module.exports = function (database) {
 
   app.use(express.json());
 
+  const authId = 'auth0|62070daf94fb2700687ca3b3';
+
   // after login
   authConfig.afterCallback = (req, res, session) => {
     const claims = jwt_decode(session.id_token);
@@ -74,14 +76,13 @@ module.exports = function (database) {
     res.send({ ...req.oidc?.user });
   });
 
-
   /** Source Routes **/
   // getting all the sources associated with the logged in user
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
     // const auth0Id = req.oidc?.user?.sub;
 
-    await database.getSources(1, (err, result) => {
+    await database.getSources(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -102,7 +103,7 @@ module.exports = function (database) {
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getItems(1, (err, result) => {
+    await database.getItems(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -124,7 +125,7 @@ module.exports = function (database) {
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getListOfEntries(1, (err, result) => {
+    await database.getListOfEntries(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
