@@ -16,7 +16,7 @@ exports.up = function (knex) {
       table.string('company');
       table.string('phone');
       table.string('email').notNullable().unique;
-      table.string('auth0Id').notNullable().unique;
+      table.string('auth0_id').notNullable().unique;
       table
         .integer('account_type_id')
         .index()
