@@ -26,16 +26,17 @@ module.exports = async function () {
   }
 
   async function createAccount(auth0Id) {
-    console.log('created account!!!!!');
+    console.log('looking for auth0 user!!!!!');
     // let result = await client.query(
     //   'SELECT * FROM account where auth0_id = $1',
     //   [auth0Id]
     // );
     // if (result.rows[0]) {
+    //   // user has been found, return user info from postgres
     //   return result.rows[0];
     // }
 
-    // await client.query('INSERT INTO account (auth0_id) VALUES ($1)', [auth0Id]);
+    // await client.query('INSERT INTO account (auth0_id, ) VALUES ($1)', [auth0Id]);
 
     // result = await client.query('SELECT * FROM account where auth0_id = $1', [
     //   auth0Id,

@@ -36,6 +36,7 @@ module.exports = function (database) {
     } = claims;
 
     console.log(sub);
+    console.log('claimssssss', claims);
 
     // select * from users where auth0_id = sub
     // if no user is returned then
@@ -52,6 +53,7 @@ module.exports = function (database) {
   app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
+  const auth0Id = 'auth';
   app.get('/api/test', checkAuth, async (req, res) => {
     // const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
     const result = await database.testQuery();
@@ -74,14 +76,13 @@ module.exports = function (database) {
     res.send({ ...req.oidc?.user });
   });
 
-
   /** Source Routes **/
   // getting all the sources associated with the logged in user
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
     // const auth0Id = req.oidc?.user?.sub;
 
-    await database.getSources(1, (err, result) => {
+    await database.getSources(auth0Id, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -102,7 +103,7 @@ module.exports = function (database) {
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getItems(1, (err, result) => {
+    await database.getItems(auth0Id, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -124,7 +125,9 @@ module.exports = function (database) {
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getListOfEntries(1, (err, result) => {
+    // const auth0Id = req.oidc?.user?.sub;
+
+    await database.getListOfEntries(auth0Id, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -140,6 +143,7 @@ module.exports = function (database) {
   // get a single entry for displaying that entry's info
   app.get('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
+    // check user id
     await database.getEntryById(entryId, (err, result) => {
       if (err) {
         res.send('Error reading from PostgreSQL');
@@ -193,11 +197,12 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
-    const accountId = 1;
+    // const accountId = 2; // need to query with auth0Id
     const { entries } = req.body;
 
     try {
-      await database.addEntries(entries, accountId);
+      await database.addEntries(entries, auth0Id);
+      // await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
       console.error(error);
