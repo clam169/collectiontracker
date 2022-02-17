@@ -42,9 +42,13 @@ module.exports = function (database) {
     // if no user is returned then
     // insert into users (auth0_id) values (sub)
     // now you have a user in the database
-    database.findAccount(sub);
-
-    return session;
+    try {
+      await database.findAccount(sub);
+      return session;
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   };
 
   app.use(auth(authConfig));

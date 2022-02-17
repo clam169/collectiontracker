@@ -27,6 +27,7 @@ module.exports = async function () {
 
   async function findAccount(auth0Id) {
     console.log('looking for auth0 user!!!!!');
+
     let result = await client.query(
       'SELECT * FROM account where auth0_id = $1',
       [auth0Id]
@@ -212,6 +213,7 @@ module.exports = async function () {
     deleteEntry,
     updateEntryById,
     addEntries,
-    createAccount,
+    findAccount,
+    addAccount,
   };
 };
