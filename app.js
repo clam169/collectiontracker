@@ -42,7 +42,7 @@ module.exports = function (database) {
     // if no user is returned then
     // insert into users (auth0_id) values (sub)
     // now you have a user in the database
-    database.createAccount(sub);
+    database.findAccount(sub);
 
     return session;
   };
@@ -73,7 +73,7 @@ module.exports = function (database) {
     }
     // select * from account where auth0_id = auth0Id
     // returns the user object
-    res.send({ ...req.oidc?.user });
+    res.send({user: { ...req.oidc?.user }});
   });
 
   /** Source Routes **/
