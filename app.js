@@ -13,6 +13,9 @@ module.exports = function (database) {
 
   app.use(express.json());
 
+  const authId = 'auth0|62070daf94fb2700687ca3b3';
+  // TODO: add to each api-> authId =req.oidc?.user?.sub;
+
   // after login
   authConfig.afterCallback = (req, res, session) => {
     const claims = jwt_decode(session.id_token);
@@ -43,7 +46,7 @@ module.exports = function (database) {
     // insert into users (auth0_id) values (sub)
     // now you have a user in the database
     try {
-      await database.findAccount(sub);
+      database.findAccount(sub);
       return session;
     } catch (error) {
       console.error(error);
@@ -77,7 +80,7 @@ module.exports = function (database) {
     }
     // select * from account where auth0_id = auth0Id
     // returns the user object
-    res.send({user: { ...req.oidc?.user }});
+    res.send({ user: { ...req.oidc?.user } });
   });
 
   /** Source Routes **/
@@ -86,7 +89,7 @@ module.exports = function (database) {
     //change 1 to account id after we can log in
     // const auth0Id = req.oidc?.user?.sub;
 
-    await database.getSources(auth0Id, (err, result) => {
+    await database.getSources(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -107,7 +110,7 @@ module.exports = function (database) {
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getItems(auth0Id, (err, result) => {
+    await database.getItems(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -129,9 +132,7 @@ module.exports = function (database) {
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    // const auth0Id = req.oidc?.user?.sub;
-
-    await database.getListOfEntries(auth0Id, (err, result) => {
+    await database.getListOfEntries(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
         console.log('Error reading from PostgreSQL', err);
@@ -205,7 +206,7 @@ module.exports = function (database) {
     const { entries } = req.body;
 
     try {
-      await database.addEntries(entries, auth0Id);
+      await database.addEntries(entries, authId);
       // await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
