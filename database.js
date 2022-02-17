@@ -69,7 +69,7 @@ module.exports = async function () {
   async function getSources(auth0Id, callback) {
     let sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
     JOIN source ON cx_source.source_id = source.source_id
-    JOIN account ON cx_account_id.account_id = account.account_id
+    JOIN account ON cx_source.account_id = account.account_id
     WHERE account.auth0_id = $1;`;
     client.query(sqlQuery, [auth0Id], (err, result) => {
       if (err) {
