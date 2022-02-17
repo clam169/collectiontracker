@@ -66,11 +66,12 @@ module.exports = async function () {
   }
 
   // get list of cx connected sources
-  async function getSources(accountId, callback) {
+  async function getSources(auth0Id, callback) {
     let sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
-    INNER JOIN source ON cx_source.source_id = source.source_id
-    WHERE cx_account_id = $1;`;
-    client.query(sqlQuery, [accountId], (err, result) => {
+    JOIN source ON cx_source.source_id = source.source_id
+    JOIN account ON cx_account_id.account_id = account.account_id
+    WHERE account.auth0_id = $1;`;
+    client.query(sqlQuery, [auth0Id], (err, result) => {
       if (err) {
         callback(err, null);
       } else {
@@ -81,12 +82,14 @@ module.exports = async function () {
     });
   }
 
-  async function getItems(accountId, callback) {
+  async function getItems(auth0Id, callback) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
-      WHERE account_item.account_id = $1;`;
-    // console.log(sqlQuery, '$1 is ', postData.body.account_id);
-    client.query(sqlQuery, [accountId], (err, result) => {
+      JOIN account ON account_item.account_id = account.account_id
+      WHERE account.auth0_id = $1;`;
+    //   WHERE account_item.account_id = $1;`;
+    // client.query(sqlQuery, [accountId], (err, result) => {
+    client.query(sqlQuery, [auth0Id], (err, result) => {
       if (err) {
         callback(err, null);
       } else {
@@ -97,16 +100,17 @@ module.exports = async function () {
     });
   }
 
-  async function getListOfEntries(accountId, callback) {
+  async function getListOfEntries(auth0Id, callback) {
     let sqlQuery = `SELECT item.name AS item_name, source.name AS source_name, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
     FROM entry
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
-    WHERE entry.account_id = $1
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
     ORDER by CREATED desc, entry_id desc;`;
     console.log(sqlQuery, '$1 is ', accountId);
-    client.query(sqlQuery, [accountId], (err, result) => {
+    client.query(sqlQuery, [auth0Id], (err, result) => {
       if (err) {
         callback(err, null);
       } else {
@@ -124,6 +128,7 @@ module.exports = async function () {
     FROM entry
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
+    JOIN account ON account_item.account_id = account.account_id
     WHERE entry.entry_id = $1;`;
     console.log('entrybyid $1 is ', entryId);
     client.query(sqlQuery, [entryId], (err, result) => {
