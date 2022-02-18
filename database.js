@@ -43,28 +43,22 @@ module.exports = async function () {
 
   async function addAccount(claims) {
     const {
-      given_name,
-      family_name,
       nickname,
-      name,
-      picture,
-      locale,
-      updated_at,
       email,
-      email_verified,
-      iss,
       sub,
-      aud,
-      iat,
-      exp,
-      nonce,
     } = claims;
-    await client.query('INSERT INTO account (auth0_id, ) VALUES ($1)', [
-      authId,
+
+    // add info from auth0 to posgresql
+    await client.query('INSERT INTO account (nickname, email, auth0_id, account_type_id) VALUES ($1, $2, $3, $4)', [
+      nickname,
+      email,
+      sub,
+      1
     ]);
 
-    result = await client.query('SELECT * FROM account where auth0_id = $1', [
-      authId,
+    // check that the auth0 info was added properly
+    let result = await client.query('SELECT * FROM account where auth0_id = $1', [
+      sub,
     ]);
     return result.rows[0];
   }
@@ -128,7 +122,7 @@ module.exports = async function () {
     });
   }
 
-  async function getListOfEntries(auth0Id, callback) {
+  async function getListOfEntries(authId, callback) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
