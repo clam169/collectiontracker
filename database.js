@@ -89,29 +89,9 @@ module.exports = async function () {
     JOIN source ON cx_source.source_id = source.source_id
     JOIN account ON cx_source.cx_account_id = account.account_id
     WHERE account.auth0_id = $1;`;
-    await client.query(sqlQuery, [authId], (err, result) => {
-      if (err) {
-        return err;
-      } else {
-        console.log('--------------------------------');
-        console.log('Sources', result.rows);
-        return result.rows;
-      }
-    });
+    const result = await client.query(sqlQuery, [authId]);
 
-    // function arrayFromEntry(authId) {
-    //   return [accountId];
-    // }
-    // const inputValues = entries.map(arrayFromEntry);
-
-    // const valuesData = sqlValues(inputValues);
-
-    // // const sqlQuery = `INSERT into entry
-    // // (account_id, source_id, item_id, weight, created, last_edit)
-    // // ${valuesData.sql}`;
-
-    // // let result = await client.query(sqlQuery, valuesData.values);
-    // return result;
+    return result.rows;
   }
 
   async function getItems(authId, callback) {

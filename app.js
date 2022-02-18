@@ -85,18 +85,6 @@ module.exports = function (database) {
       console.error(error);
       res.status(500).send({ error });
     }
-
-    // await database.getSources(authId, (err, result) => {
-
-    //   if (err) {
-    //     res.json({ message: 'Error reading from PostgreSQL' });
-    //     console.log('Error reading from PostgreSQL', err);
-    //   } else {
-    //     //success
-    //     res.json(result);
-    //     console.log('get source list~~~~~~~~~~~~~~');
-    //   }
-    // });
   });
 
   // TODO: post request to add a new source to this Cx account
