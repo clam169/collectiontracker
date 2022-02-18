@@ -42,24 +42,19 @@ module.exports = async function () {
   }
 
   async function addAccount(claims) {
-    const {
-      nickname,
-      email,
-      sub,
-    } = claims;
+    const { nickname, email, sub } = claims;
 
     // add info from auth0 to posgresql
-    await client.query('INSERT INTO account (nickname, email, auth0_id, account_type_id) VALUES ($1, $2, $3, $4)', [
-      nickname,
-      email,
-      sub,
-      1
-    ]);
+    await client.query(
+      'INSERT INTO account (nickname, email, auth0_id, account_type_id) VALUES ($1, $2, $3, $4)',
+      [nickname, email, sub, 1]
+    );
 
     // check that the auth0 info was added properly
-    let result = await client.query('SELECT * FROM account where auth0_id = $1', [
-      sub,
-    ]);
+    let result = await client.query(
+      'SELECT * FROM account where auth0_id = $1',
+      [sub]
+    );
     return result.rows[0];
   }
 
@@ -88,20 +83,35 @@ module.exports = async function () {
   }
 
   // get list of cx connected sources
-  async function getSources(authId, callback) {
-    let sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
+  async function getSources(authId) {
+    console.log('AAAAAUTH ', authId);
+    const sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
     JOIN source ON cx_source.source_id = source.source_id
     JOIN account ON cx_source.cx_account_id = account.account_id
     WHERE account.auth0_id = $1;`;
-    client.query(sqlQuery, [authId], (err, result) => {
+    await client.query(sqlQuery, [authId], (err, result) => {
       if (err) {
-        callback(err, null);
+        return err;
       } else {
         console.log('--------------------------------');
         console.log('Sources', result.rows);
-        callback(null, result.rows);
+        return result.rows;
       }
     });
+
+    // function arrayFromEntry(authId) {
+    //   return [accountId];
+    // }
+    // const inputValues = entries.map(arrayFromEntry);
+
+    // const valuesData = sqlValues(inputValues);
+
+    // // const sqlQuery = `INSERT into entry
+    // // (account_id, source_id, item_id, weight, created, last_edit)
+    // // ${valuesData.sql}`;
+
+    // // let result = await client.query(sqlQuery, valuesData.values);
+    // return result;
   }
 
   async function getItems(authId, callback) {

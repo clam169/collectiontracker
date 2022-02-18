@@ -77,9 +77,10 @@ module.exports = function (database) {
     const authId = req.oidc?.user?.sub;
 
     try {
-      const result = await database.getSources(authId);
+      let result = await database.getSources(authId);
       // await database.addEntries(entries, accountId);
-      res.json(result);
+      console.log('resuuuuuuult', result);
+      res.send(result);
     } catch (error) {
       console.error(error);
       res.status(500).send({ error });
