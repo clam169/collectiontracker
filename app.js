@@ -65,28 +65,37 @@ module.exports = function (database) {
     if (authId) {
       // user is logged in with auth0
       res.send({ user: { ...req.oidc?.user } });
-    }
-    else {
+    } else {
       res.status(500).send({ error });
     }
   });
 
   /** Source Routes **/
   // getting all the sources associated with the logged in user
-  app.get('/api/sources', checkAuth, async (req, res) => {
+  app.get('/api/sources', async (req, res) => {
     //change 1 to account id after we can log in
-    // const authId = req.oidc?.user?.sub;
+    const authId = req.oidc?.user?.sub;
 
-    await database.getSources(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        console.log('get source list~~~~~~~~~~~~~~');
-      }
-    });
+    try {
+      const result = await database.getSources(authId);
+      // await database.addEntries(entries, accountId);
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+
+    // await database.getSources(authId, (err, result) => {
+
+    //   if (err) {
+    //     res.json({ message: 'Error reading from PostgreSQL' });
+    //     console.log('Error reading from PostgreSQL', err);
+    //   } else {
+    //     //success
+    //     res.json(result);
+    //     console.log('get source list~~~~~~~~~~~~~~');
+    //   }
+    // });
   });
 
   // TODO: post request to add a new source to this Cx account
