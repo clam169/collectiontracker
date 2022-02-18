@@ -146,6 +146,7 @@ module.exports = function (database) {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     console.log('updatedEntry', updatedEntry);
+
     await database.updateEntryById(entryId, updatedEntry, (err, result) => {
       if (err) {
         console.log('Something went wrong :(', err);

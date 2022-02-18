@@ -72,6 +72,7 @@ module.exports = async function () {
     ];
     console.log('PARAAMSMAMASMMASMASMASMAS');
     console.log(params);
+
     await client.query(sqlQuery, params, (err, result) => {
       if (err) {
         callback(err, null);
