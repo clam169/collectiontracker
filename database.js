@@ -154,7 +154,7 @@ module.exports = async function () {
     FROM entry
     JOIN item ON entry.item_id = item.item_id
     JOIN source ON entry.source_id = source.source_id
-    JOIN account ON account_item.account_id = account.account_id
+    JOIN account ON entry.account_id = account.account_id
     WHERE entry.entry_id = $1;`;
     console.log('entrybyid $1 is ', entryId);
     client.query(sqlQuery, [entryId], (err, result) => {

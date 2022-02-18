@@ -13,7 +13,7 @@ module.exports = function (database) {
 
   app.use(express.json());
 
-  const authId = 'auth0|62070daf94fb2700687ca3b3';
+  // const authId = 'auth0|62070daf94fb2700687ca3b3';
   // TODO: add to each api-> authId =req.oidc?.user?.sub;
 
   // after login
@@ -73,10 +73,16 @@ module.exports = function (database) {
 
   /** Auth Route **/
 
-  app.get('/api/profile', checkAuth, (req, res) => {
+  app.get('/api/profile', checkAuth, async (req, res) => {
     const authId = req.oidc?.user?.sub;
-    if (authId) { // user is logged in with auth0
-      let isFound = findAccount(authId)
+    if (authId) {
+      // user is logged in with auth0
+      let isFound = await database.findAccount(authId); // returns row or false
+      if (!isFound) {
+        console.log('-------- authId does not exist in db', isFound);
+      } else {
+        console.log('-------- authId does exist in db', isFound);
+      }
     }
     // select * from account where auth0_id = authId
     // returns the user object
