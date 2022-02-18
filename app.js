@@ -73,7 +73,6 @@ module.exports = function (database) {
   /** Source Routes **/
   // getting all the sources associated with the logged in user
   app.get('/api/sources', async (req, res) => {
-    //change 1 to account id after we can log in
     const authId = req.oidc?.user?.sub;
 
     try {
@@ -95,18 +94,16 @@ module.exports = function (database) {
   /** Item Routes **/
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
-    //change 1 to account id after we can log in
-    await database.getItems(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        //Output the results of the query to the Heroku Logs
-        console.log('get items --------------------------------');
-      }
-    });
+    const authId = req.oidc?.user?.sub;
+
+    try {
+      let result = await database.getItems(authId);
+      console.log('resuuuuuuult items ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   // TODO: post request to input data. Just validates for now

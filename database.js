@@ -94,22 +94,16 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function getItems(authId, callback) {
+  async function getItems(authId) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
       JOIN account ON account_item.account_id = account.account_id
       WHERE account.auth0_id = $1;`;
     //   WHERE account_item.account_id = $1;`;
     // client.query(sqlQuery, [accountId], (err, result) => {
-    client.query(sqlQuery, [authId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('-----------GET ITEMS---------------------');
-        console.log('items', result.rows);
-        callback(null, result.rows);
-      }
-    });
+    const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
   }
 
   async function getListOfEntries(authId, callback) {
