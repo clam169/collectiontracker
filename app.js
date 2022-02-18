@@ -75,7 +75,7 @@ module.exports = function (database) {
   // getting all the sources associated with the logged in user
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    // const authId = req.oidc?.user?.sub;
+    const authId = req.oidc?.user?.sub;
 
     await database.getSources(authId, (err, result) => {
       if (err) {
@@ -97,7 +97,7 @@ module.exports = function (database) {
   /** Item Routes **/
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
-    //change 1 to account id after we can log in
+    const authId = req.oidc?.user?.sub;
     await database.getItems(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
@@ -119,7 +119,7 @@ module.exports = function (database) {
   /** Entry Routes **/
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
-    //change 1 to account id after we can log in
+    const authId = req.oidc?.user?.sub;
     await database.getListOfEntries(authId, (err, result) => {
       if (err) {
         res.json({ message: 'Error reading from PostgreSQL' });
@@ -190,11 +190,12 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
-    // const accountId = 2; // need to query with authId
+    const authId = req.oidc?.user?.sub;
+    const accountId = 2;
     const { entries } = req.body;
 
     try {
-      await database.addEntries(entries, authId);
+      await database.addEntries(entries, accountId);
       // await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
