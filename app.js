@@ -13,40 +13,27 @@ module.exports = function (database) {
 
   app.use(express.json());
 
-  const authId = 'auth0|62070daf94fb2700687ca3b3';
+  // const authId = 'auth0|62070daf94fb2700687ca3b3';
   // TODO: add to each api-> authId =req.oidc?.user?.sub;
 
   // after login
-  authConfig.afterCallback = (req, res, session) => {
+  authConfig.afterCallback = async (req, res, session) => {
     const claims = jwt_decode(session.id_token);
 
-    const {
-      given_name,
-      family_name,
-      nickname,
-      name,
-      picture,
-      locale,
-      updated_at,
-      email,
-      email_verified,
-      iss,
-      sub,
-      aud,
-      iat,
-      exp,
-      nonce,
-    } = claims;
-
-    console.log(sub);
-    console.log('claimssssss', claims);
-
+    console.log('This is what we get from auth0: ', claims);
+    const { sub } = claims;
     // select * from users where auth0_id = sub
     // if no user is returned then
     // insert into users (auth0_id) values (sub)
     // now you have a user in the database
     try {
-      database.findAccount(sub);
+      let existsInDb = await database.findAccount(sub); // returns row or false
+      if (!existsInDb) {
+        console.log('-------- authId does not exist in db', existsInDb);
+        database.addAccount(claims);
+      } else {
+        console.log('-------- authId does exist in db', existsInDb);
+      }
       return session;
     } catch (error) {
       console.error(error);
@@ -60,7 +47,7 @@ module.exports = function (database) {
   app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
-  const auth0Id = 'auth';
+  const authId = 'auth';
   app.get('/api/test', checkAuth, async (req, res) => {
     // const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
     const result = await database.testQuery();
@@ -73,21 +60,22 @@ module.exports = function (database) {
 
   /** Auth Route **/
 
-  app.get('/api/profile', checkAuth, (req, res) => {
-    const auth0Id = req.oidc?.user?.sub;
-    if (auth0Id) {
-      // idk something went wrong don't know how so maybe no need for a check
+  app.get('/api/profile', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    if (authId) {
+      // user is logged in with auth0
+      res.send({ user: { ...req.oidc?.user } });
     }
-    // select * from account where auth0_id = auth0Id
-    // returns the user object
-    res.send({ user: { ...req.oidc?.user } });
+    else {
+      res.status(500).send({ error });
+    }
   });
 
   /** Source Routes **/
   // getting all the sources associated with the logged in user
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    // const auth0Id = req.oidc?.user?.sub;
+    // const authId = req.oidc?.user?.sub;
 
     await database.getSources(authId, (err, result) => {
       if (err) {
@@ -202,7 +190,7 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
-    // const accountId = 2; // need to query with auth0Id
+    // const accountId = 2; // need to query with authId
     const { entries } = req.body;
 
     try {
