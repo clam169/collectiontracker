@@ -134,7 +134,7 @@ module.exports = function (database) {
   });
 
   // get a single entry for displaying that entry's info
-  app.get('/api/entry/:id', checkAuth, async (req, res) => {
+  app.get('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     // check user id
     await database.getEntryById(entryId, (err, result) => {
@@ -158,7 +158,7 @@ module.exports = function (database) {
   });
 
   //updates an entry with new data
-  app.put('/api/entry/:id', checkAuth, async (req, res) => {
+  app.put('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     console.log('updatedEntry', updatedEntry);
@@ -174,7 +174,7 @@ module.exports = function (database) {
     });
   });
 
-  app.delete('/api/entry/:id', checkAuth, async (req, res) => {
+  app.delete('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     database.deleteEntry(entryId, (err, result) => {
       if (err) {
