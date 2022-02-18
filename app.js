@@ -115,41 +115,30 @@ module.exports = function (database) {
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    await database.getListOfEntries(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        //Output the results of the query to the Heroku Logs
-        console.log('get List of Entries --------------------------------');
-      }
-    });
+    const authId = req.oidc?.user?.sub;
+
+    try {
+      let result = await database.getListOfEntries(authId);
+      console.log('resuuuuuuult entries ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   // get a single entry for displaying that entry's info
   app.get('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     // check user id
-    await database.getEntryById(entryId, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        const entry = result[0];
-        //success
-        res.send(entry);
-        // option to change the styling of the data to a more common JSON format
-        // res.json({
-        //   entryId: entry.entry_id,
-        //   itemId: entry.item_id,
-        //   sourceId: entry.source_id,
-        //   date: entry.created,
-        //   weight: entry.weight,
-        // });
-      }
-    });
+    try {
+      let result = await database.getEntryById(entryId);
+      console.log('resuuuuuuult entry by Id ', result);
+      res.send(result[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   //updates an entry with new data
@@ -171,17 +160,13 @@ module.exports = function (database) {
 
   app.delete('/api/entry/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
-    database.deleteEntry(entryId, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json({ message: `entry ${entryId} was deleted` });
-        //Output the results of the query to the Heroku Logs
-        console.log('deleteEntry --------------------------------');
-      }
-    });
+    try {
+      let result = await database.deleteEntry(entryId);
+      res.send({ message: `entry ${entryId} was deleted` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
