@@ -60,7 +60,7 @@ module.exports = function (database) {
   app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
-  const auth0Id = 'auth';
+  const authId = 'auth';
   app.get('/api/test', checkAuth, async (req, res) => {
     // const userStatus = req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out';
     const result = await database.testQuery();
@@ -74,11 +74,11 @@ module.exports = function (database) {
   /** Auth Route **/
 
   app.get('/api/profile', checkAuth, (req, res) => {
-    const auth0Id = req.oidc?.user?.sub;
-    if (auth0Id) {
-      // idk something went wrong don't know how so maybe no need for a check
+    const authId = req.oidc?.user?.sub;
+    if (authId) { // user is logged in with auth0
+      let isFound = findAccount(authId)
     }
-    // select * from account where auth0_id = auth0Id
+    // select * from account where auth0_id = authId
     // returns the user object
     res.send({ user: { ...req.oidc?.user } });
   });
@@ -87,7 +87,7 @@ module.exports = function (database) {
   // getting all the sources associated with the logged in user
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
-    // const auth0Id = req.oidc?.user?.sub;
+    // const authId = req.oidc?.user?.sub;
 
     await database.getSources(authId, (err, result) => {
       if (err) {
@@ -202,7 +202,7 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
-    // const accountId = 2; // need to query with auth0Id
+    // const accountId = 2; // need to query with authId
     const { entries } = req.body;
 
     try {
