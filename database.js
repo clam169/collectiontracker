@@ -74,6 +74,7 @@ module.exports = async function () {
     ];
     console.log('PARAAMSMAMASMMASMASMASMAS');
     console.log(params);
+
     await client.query(sqlQuery, params, (err, result) => {
       if (err) {
         callback(err, null);
@@ -85,38 +86,27 @@ module.exports = async function () {
   }
 
   // get list of cx connected sources
-  async function getSources(authId, callback) {
-    let sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
+  async function getSources(authId) {
+    console.log('AAAAAUTH ', authId);
+    const sqlQuery = `SELECT cx_source.source_id, name, address, phone_number FROM cx_source
     JOIN source ON cx_source.source_id = source.source_id
     JOIN account ON cx_source.cx_account_id = account.account_id
     WHERE account.auth0_id = $1;`;
-    client.query(sqlQuery, [authId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('--------------------------------');
-        console.log('Sources', result.rows);
-        callback(null, result.rows);
-      }
-    });
+    const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
   }
 
-  async function getItems(authId, callback) {
+  async function getItems(authId) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
       JOIN account ON account_item.account_id = account.account_id
       WHERE account.auth0_id = $1;`;
     //   WHERE account_item.account_id = $1;`;
     // client.query(sqlQuery, [accountId], (err, result) => {
-    client.query(sqlQuery, [authId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('-----------GET ITEMS---------------------');
-        console.log('items', result.rows);
-        callback(null, result.rows);
-      }
-    });
+    const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
   }
 
   async function getListOfEntries(authId, callback) {
@@ -129,16 +119,9 @@ module.exports = async function () {
     JOIN account ON entry.account_id = account.account_id
     WHERE account.auth0_id = $1
     ORDER by CREATED desc, entry_id desc;`;
-    // console.log(sqlQuery, '$1 is ', accountId);
-    client.query(sqlQuery, [authId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('--------------------------------');
-        console.log(result.rows);
-        callback(null, result.rows);
-      }
-    });
+    const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
   }
 
   async function getEntryById(entryId, callback) {
@@ -151,29 +134,18 @@ module.exports = async function () {
     JOIN account ON entry.account_id = account.account_id
     WHERE entry.entry_id = $1;`;
     console.log('entrybyid $1 is ', entryId);
-    client.query(sqlQuery, [entryId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('--------------------------------');
-        console.log('single entry request', result.rows);
-        callback(null, result.rows);
-      }
-    });
+
+    const result = await client.query(sqlQuery, [entryId]);
+
+    return result.rows;
   }
 
   async function deleteEntry(entryId, callback) {
     let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
     console.log(sqlQuery, '$1 is ', entryId);
-    client.query(sqlQuery, [entryId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        console.log('--------------------------------');
-        console.log(result);
-        callback(null, result);
-      }
-    });
+    const result = await client.query(sqlQuery, [entryId]);
+
+    return result;
   }
 
   const addEntries = async (entries, accountId) => {
