@@ -124,7 +124,9 @@ module.exports = async function () {
   let editEntry = {
     entry_id: 1,
     item_id: 1,
+    item_name,
     source_id: 1,
+    source_name,
     entry_weight: 29,
     entry_date: '2022-01-01',
   };
