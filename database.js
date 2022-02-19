@@ -35,8 +35,10 @@ module.exports = async function () {
     );
     if (result.rows[0]) {
       // user has been found, return user info from postgres
+      // console.log('the user: ', result.rows[0]);
       return result.rows[0];
     } else {
+      console.log('cannot find user');
       return false;
     }
   }
@@ -162,6 +164,7 @@ module.exports = async function () {
     const inputValues = entries.map(arrayFromEntry);
 
     const valuesData = sqlValues(inputValues);
+    console.log('VALUES DATA: ', valuesData);
 
     const sqlQuery = `INSERT into entry
     (account_id, source_id, item_id, weight, created, last_edit)

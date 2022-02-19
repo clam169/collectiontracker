@@ -72,7 +72,10 @@ module.exports = function (database) {
 
   /** Source Routes **/
   // getting all the sources associated with the logged in user
-  app.get('/api/sources', async (req, res) => {
+
+  app.get('/api/sources', checkAuth, async (req, res) => {
+    //change 1 to account id after we can log in
+
     const authId = req.oidc?.user?.sub;
 
     try {
@@ -104,6 +107,7 @@ module.exports = function (database) {
       console.error(error);
       res.status(500).send({ error });
     }
+
   });
 
   // TODO: post request to input data. Just validates for now
@@ -125,10 +129,11 @@ module.exports = function (database) {
       console.error(error);
       res.status(500).send({ error });
     }
+
   });
 
   // get a single entry for displaying that entry's info
-  app.get('/api/entry/:id', checkAuth, async (req, res) => {
+  app.get('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     // check user id
     try {
@@ -142,7 +147,7 @@ module.exports = function (database) {
   });
 
   //updates an entry with new data
-  app.put('/api/entry/:id', checkAuth, async (req, res) => {
+  app.put('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     console.log('updatedEntry', updatedEntry);
@@ -159,7 +164,7 @@ module.exports = function (database) {
     });
   });
 
-  app.delete('/api/entry/:id', checkAuth, async (req, res) => {
+  app.delete('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     try {
       let result = await database.deleteEntry(entryId);
@@ -171,11 +176,13 @@ module.exports = function (database) {
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
-    // const accountId = 2; // need to query with authId
-    const { entries } = req.body;
-
+    const authId = req.oidc?.user?.sub;
+    const { entries } = req.body.data;
+    console.log('entries: ', entries);
     try {
-      await database.addEntries(entries, authId);
+      const user = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', user);
+      await database.addEntries(entries, user.account_id);
       // await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
