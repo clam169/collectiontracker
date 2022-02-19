@@ -65,8 +65,7 @@ module.exports = function (database) {
     if (authId) {
       // user is logged in with auth0
       res.send({ user: { ...req.oidc?.user } });
-    }
-    else {
+    } else {
       res.status(500).send({ error });
     }
   });
@@ -191,11 +190,12 @@ module.exports = function (database) {
 
   app.post('/api/entries', checkAuth, async (req, res) => {
     const authId = req.oidc?.user?.sub;
-    const accountId = 2;
-    const { entries } = req.body;
-
+    const { entries } = req.body.data;
+    console.log('entries: ', entries);
     try {
-      await database.addEntries(entries, accountId);
+      const user = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', user);
+      await database.addEntries(entries, user.account_id);
       // await database.addEntries(entries, accountId);
       res.send({});
     } catch (error) {
