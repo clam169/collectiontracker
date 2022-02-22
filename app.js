@@ -91,8 +91,8 @@ module.exports = function (database) {
 
   // post request to add a new source to this Cx account
   app.post('/api/sources', async (req, res) => {
-    // const authId = req.oidc?.user?.sub;
-    const authId = 'auth0|62070daf94fb2700687ca3b3';
+    const authId = req.oidc?.user?.sub;
+    // const authId = 'auth0|62070daf94fb2700687ca3b3';
     const { newSource } = req.body.data;
     console.log('newSource: ', newSource);
     try {

@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 
-const { sqlValues, sourceValues } = require('./databaseHelpers');
+const { sqlValues, sourceSqlValues } = require('./databaseHelpers');
 
 const pool = new Pool({
   host: process.env.PG_HOST,
@@ -72,8 +72,6 @@ module.exports = async function () {
       editDate,
       entryId,
     ];
-    console.log('PARAAMSMAMASMMASMASMASMAS');
-    console.log(params);
 
     await client.query(sqlQuery, params, (err, result) => {
       if (err) {
@@ -99,14 +97,18 @@ module.exports = async function () {
 
   // add new source for logged in user
   async function addSource(newSource, accountId) {
-    const sqlQuery = `with new_source as (
-      insert into source(name, address)
-      values ($2, $3)
-      returning source_id)
-      insert into cx_source (source_id, cx_account_id)
-      select source_id, $1
-      from new_source;`;
-    const result = await client.query(sqlQuery, [accountId, newSource.name, newSource.address]);
+    const valuesData = sourceSqlValues(newSource);
+    const sqlQuery = `WITH new_source AS (
+      INSERT INTO source(${valuesData.columnNames})
+      VALUES (${valuesData.numString})
+      RETURNING source_id)
+      INSERT INTO cx_source (source_id, cx_account_id)
+      SELECT source_id, $1
+      FROM new_source;`;
+    const result = await client.query(sqlQuery, [
+      accountId,
+      ...valuesData.values,
+    ]);
 
     return result.rows;
   }

@@ -18,19 +18,27 @@ const sqlValues = (inputValues) => {
   };
 };
 
-const sourceValues = (sourceObject) => {
-  const columnNames = Object.keys(sourceObject).join(', ');
+const sourceSqlValues = (sourceObject) => {
+  const columnNames = Object.keys(sourceObject)
+    .map((key) => camelToSnakeCase(key))
+    .join(', ');
+  let numArray = [];
   let values = [];
   let num = 2;
   for (let value in sourceObject) {
-    values.push('$' + num);
-    num++
+    numArray.push('$' + num);
+    values.push(sourceObject[value]);
+    num++;
   }
-  const valuesString = values.join(', ');
+  const numString = numArray.join(', ');
   return {
     columnNames,
-    valuesString
-  }
+    numString,
+    values,
+  };
 };
 
-exports.sqlValues = {sqlValues, sourceValues};
+const camelToSnakeCase = (str) =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
+module.exports = { sqlValues, sourceSqlValues };
