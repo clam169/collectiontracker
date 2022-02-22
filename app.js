@@ -89,9 +89,23 @@ module.exports = function (database) {
     }
   });
 
-  // TODO: post request to add a new source to this Cx account
-  app.post('/api/sources', checkAuth, async (req, res) => {
-    res.send(`New source to be added`);
+  // post request to add a new source to this Cx account
+  app.post('/api/sources', async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    // const authId = 'auth0|62070daf94fb2700687ca3b3';
+    const { newSource } = req.body.data;
+    console.log('newSource: ', newSource);
+    try {
+      const account = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', account);
+      await database.addSource(newSource, account.account_id);
+      res.send({
+        msg: 'New source added successfully'
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   /** Item Routes **/
