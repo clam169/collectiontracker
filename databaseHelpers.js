@@ -17,4 +17,20 @@ const sqlValues = (inputValues) => {
     values,
   };
 };
-exports.sqlValues = sqlValues;
+
+const sourceValues = (sourceObject) => {
+  const columnNames = Object.keys(sourceObject).join(', ');
+  let values = [];
+  let num = 2;
+  for (let value in sourceObject) {
+    values.push('$' + num);
+    num++
+  }
+  const valuesString = values.join(', ');
+  return {
+    columnNames,
+    valuesString
+  }
+};
+
+exports.sqlValues = {sqlValues, sourceValues};

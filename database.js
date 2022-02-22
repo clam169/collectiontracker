@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 
-const { sqlValues } = require('./databaseHelpers');
+const { sqlValues, sourceValues } = require('./databaseHelpers');
 
 const pool = new Pool({
   host: process.env.PG_HOST,
