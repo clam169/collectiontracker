@@ -97,6 +97,20 @@ module.exports = async function () {
     return result.rows;
   }
 
+  // add new source for logged in user
+  async function addSource(newSource, accountId) {
+    const sqlQuery = `with new_source as (
+      insert into source(name, address)
+      values ($2, $3)
+      returning source_id)
+      insert into cx_source (source_id, cx_account_id)
+      select source_id, $1
+      from new_source;`;
+    const result = await client.query(sqlQuery, [accountId, newSource.name, newSource.address]);
+
+    return result.rows;
+  }
+
   async function getItems(authId) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
@@ -178,6 +192,7 @@ module.exports = async function () {
     testQuery,
     getEntryById,
     getSources,
+    addSource,
     getItems,
     getListOfEntries,
     deleteEntry,
