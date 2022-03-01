@@ -114,20 +114,12 @@ module.exports = async function () {
   }
 
   async function updateSource(sourceId, postData) {
-    // const sqlQuery = `WITH new_source AS (
-    //   INSERT INTO source(${valuesData.columnNames})
-    //   VALUES (${valuesData.numString})
-    //   RETURNING source_id)
-    //   INSERT INTO cx_source (source_id, cx_account_id)
-    //   SELECT source_id, $1
-    //   FROM new_source;`;
-
     let sqlQuery = `UPDATE source SET name = $1, address = $2, phone_number = $3
       WHERE source_id = $4`;
     let params = [
       postData.name,
       postData.address,
-      postData.phone_number,
+      postData.phoneNumber,
       sourceId,
     ];
 
