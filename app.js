@@ -107,6 +107,21 @@ module.exports = function (database) {
     }
   });
 
+  app.put('/api/sources/:id', async (req, res) => {
+    const sourceId = req.params.id;
+    const sourceEdit = req.body;
+    console.log('sourceEdit: ', sourceEdit, 'source ID: ', sourceId);
+    try {
+      await database.updateSource(sourceId, sourceEdit);
+      res.send({
+        msg: 'source has been updated',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   /** Item Routes **/
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
