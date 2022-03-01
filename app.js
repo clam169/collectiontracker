@@ -92,15 +92,14 @@ module.exports = function (database) {
   // post request to add a new source to this Cx account
   app.post('/api/sources', async (req, res) => {
     const authId = req.oidc?.user?.sub;
-    // const authId = 'auth0|62070daf94fb2700687ca3b3';
-    const { newSource } = req.body.data;
+    const newSource = req.body.data;
     console.log('newSource: ', newSource);
     try {
       const account = await database.findAccount(authId);
       console.log('ACCCOCUNT ID', account);
       await database.addSource(newSource, account.account_id);
       res.send({
-        msg: 'New source added successfully'
+        msg: 'New source added successfully',
       });
     } catch (error) {
       console.error(error);
@@ -121,7 +120,6 @@ module.exports = function (database) {
       console.error(error);
       res.status(500).send({ error });
     }
-
   });
 
   // TODO: post request to input data. Just validates for now
@@ -143,7 +141,6 @@ module.exports = function (database) {
       console.error(error);
       res.status(500).send({ error });
     }
-
   });
 
   // get a single entry for displaying that entry's info
