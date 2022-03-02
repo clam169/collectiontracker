@@ -113,6 +113,21 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function updateSource(sourceId, postData) {
+    let sqlQuery = `UPDATE source SET name = $1, address = $2, phone_number = $3
+      WHERE source_id = $4`;
+    let params = [
+      postData.name,
+      postData.address,
+      postData.phoneNumber,
+      sourceId,
+    ];
+
+    const result = await client.query(sqlQuery, params);
+
+    return result.rows;
+  }
+
   async function getItems(authId) {
     let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
       JOIN item ON account_item.item_id = item.item_id
@@ -202,5 +217,6 @@ module.exports = async function () {
     addEntries,
     findAccount,
     addAccount,
+    updateSource,
   };
 };
