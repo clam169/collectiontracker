@@ -110,7 +110,6 @@ module.exports = function (database) {
   app.put('/api/sources/:id', async (req, res) => {
     const sourceId = req.params.id;
     const sourceEdit = req.body.data;
-    console.log('sourceEdit: ', sourceEdit, 'source ID: ', sourceId);
     try {
       await database.updateSource(sourceId, sourceEdit);
       res.send({
