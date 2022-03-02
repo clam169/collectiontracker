@@ -17,4 +17,28 @@ const sqlValues = (inputValues) => {
     values,
   };
 };
-exports.sqlValues = sqlValues;
+
+const sourceSqlValues = (sourceObject) => {
+  const columnNames = Object.keys(sourceObject)
+    .map((key) => camelToSnakeCase(key))
+    .join(', ');
+  let numArray = [];
+  let values = [];
+  let num = 2;
+  for (let value in sourceObject) {
+    numArray.push('$' + num);
+    values.push(sourceObject[value]);
+    num++;
+  }
+  const numString = numArray.join(', ');
+  return {
+    columnNames,
+    numString,
+    values,
+  };
+};
+
+const camelToSnakeCase = (str) =>
+  str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
+module.exports = { sqlValues, sourceSqlValues };

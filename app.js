@@ -72,42 +72,68 @@ module.exports = function (database) {
 
   /** Source Routes **/
   // getting all the sources associated with the logged in user
+
   app.get('/api/sources', checkAuth, async (req, res) => {
     //change 1 to account id after we can log in
+
     const authId = req.oidc?.user?.sub;
 
-    await database.getSources(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        console.log('get source list~~~~~~~~~~~~~~');
-      }
-    });
+    try {
+      let result = await database.getSources(authId);
+      // await database.addEntries(entries, accountId);
+      console.log('resuuuuuuult', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
-  // TODO: post request to add a new source to this Cx account
-  app.post('/api/sources', checkAuth, async (req, res) => {
-    res.send(`New source to be added`);
+  // post request to add a new source to this Cx account
+  app.post('/api/sources', async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const newSource = req.body.data;
+    console.log('newSource: ', newSource);
+    try {
+      const account = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', account);
+      await database.addSource(newSource, account.account_id);
+      res.send({
+        msg: 'New source added successfully',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
+  app.put('/api/sources/:id', async (req, res) => {
+    const sourceId = req.params.id;
+    const sourceEdit = req.body.data;
+    try {
+      await database.updateSource(sourceId, sourceEdit);
+      res.send({
+        msg: 'source has been updated',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   /** Item Routes **/
   // get the list of items associated with this account
   app.get('/api/items', checkAuth, async (req, res) => {
     const authId = req.oidc?.user?.sub;
-    await database.getItems(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        //Output the results of the query to the Heroku Logs
-        console.log('get items --------------------------------');
-      }
-    });
+
+    try {
+      let result = await database.getItems(authId);
+      console.log('resuuuuuuult items ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   // TODO: post request to input data. Just validates for now
@@ -118,42 +144,31 @@ module.exports = function (database) {
   /** Entry Routes **/
   // get the list of entries made by that account
   app.get('/api/entries', checkAuth, async (req, res) => {
+    //change 1 to account id after we can log in
     const authId = req.oidc?.user?.sub;
-    await database.getListOfEntries(authId, (err, result) => {
-      if (err) {
-        res.json({ message: 'Error reading from PostgreSQL' });
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json(result);
-        //Output the results of the query to the Heroku Logs
-        console.log('get List of Entries --------------------------------');
-      }
-    });
+
+    try {
+      let result = await database.getListOfEntries(authId);
+      console.log('resuuuuuuult entries ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   // get a single entry for displaying that entry's info
   app.get('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
     // check user id
-    await database.getEntryById(entryId, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        const entry = result[0];
-        //success
-        res.send(entry);
-        // option to change the styling of the data to a more common JSON format
-        // res.json({
-        //   entryId: entry.entry_id,
-        //   itemId: entry.item_id,
-        //   sourceId: entry.source_id,
-        //   date: entry.created,
-        //   weight: entry.weight,
-        // });
-      }
-    });
+    try {
+      let result = await database.getEntryById(entryId);
+      console.log('resuuuuuuult entry by Id ', result);
+      res.send(result[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   //updates an entry with new data
@@ -161,6 +176,7 @@ module.exports = function (database) {
     const entryId = req.params.id;
     const updatedEntry = req.body.data;
     console.log('updatedEntry', updatedEntry);
+
     await database.updateEntryById(entryId, updatedEntry, (err, result) => {
       if (err) {
         console.log('Something went wrong :(', err);
@@ -175,17 +191,13 @@ module.exports = function (database) {
 
   app.delete('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;
-    database.deleteEntry(entryId, (err, result) => {
-      if (err) {
-        res.send('Error reading from PostgreSQL');
-        console.log('Error reading from PostgreSQL', err);
-      } else {
-        //success
-        res.json({ message: `entry ${entryId} was deleted` });
-        //Output the results of the query to the Heroku Logs
-        console.log('deleteEntry --------------------------------');
-      }
-    });
+    try {
+      let result = await database.deleteEntry(entryId);
+      res.send({ message: `entry ${entryId} was deleted` });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   app.post('/api/entries', checkAuth, async (req, res) => {
@@ -203,6 +215,22 @@ module.exports = function (database) {
       res.status(500).send({ error });
     }
   });
+
+  // app.get(
+  //   '/api/graph/',
+  //   async(req, (res) => {
+  //     const accountId = 1;
+  //     try {
+  //       const stuffThatGraphLibraryNeeds = await database.SOMETHING(
+  //         accountId
+  //       );
+  //       res.send({});
+  //     } catch (error) {
+  //       console.error(error);
+  //       res.status(500).send({ error });
+  //     }
+  //   })
+  // );
 
   /** Render pages **/
   // anything that hasn't been serverd through a route should be served by the react app
