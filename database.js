@@ -140,6 +140,18 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function getItemsByDateRange(startDate, endDate, authId) {
+    let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
+      JOIN item ON account_item.item_id = item.item_id
+      JOIN account ON account_item.account_id = account.account_id
+      WHERE account.auth0_id = $1;`;
+    //   WHERE account_item.account_id = $1;`;
+    // client.query(sqlQuery, [accountId], (err, result) => {
+    const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
+  }
+
   async function getListOfEntries(authId, callback) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,

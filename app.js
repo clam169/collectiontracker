@@ -136,6 +136,25 @@ module.exports = function (database) {
     }
   });
 
+  app.get('/api/items/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getItemsByDateRange(
+        startDate,
+        endDate,
+        authId
+      );
+      console.log('resuuuuuuult items ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   // TODO: post request to input data. Just validates for now
   app.post('/api/items', checkAuth, async (req, res, next) => {
     res.send(`New item to be added`);
