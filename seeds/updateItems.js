@@ -5,14 +5,7 @@
 exports.seed = function (knex) {
   return knex('account_type')
     .insert([{ account_type: 'cx' }, { account_type: 'sx' }])
-    .then(() => {
-      return knex('item').insert([
-        { name: 'Paper Cups' },
-        { name: 'Coffee Pods' },
-        { name: 'Coffee Chaffs' },
-        { name: 'Love' },
-      ]);
-    })
+
     .then(() => {
       return knex('account').insert([
         {
@@ -54,14 +47,27 @@ exports.seed = function (knex) {
       ]);
     })
     .then(() => {
-      return knex('account_item').insert([
-        { item_id: 1, account_id: 1 },
-        { item_id: 2, account_id: 1 },
-        { item_id: 3, account_id: 1 },
-        { item_id: 1, account_id: 2 },
-        { item_id: 2, account_id: 2 },
-        { item_id: 4, account_id: 2 },
-        { item_id: 4, account_id: 3 },
+      return knex('item').insert([
+        {
+          name: 'Paper Cups',
+          account_id: 1,
+        },
+        {
+          name: 'Coffee Pods',
+          account_id: 1,
+        },
+        {
+          name: 'Coffee Chaffs',
+          account_id: 1,
+        },
+        {
+          name: 'Love',
+          account_id: 1,
+        },
+        {
+          name: 'Love',
+          account_id: 2,
+        },
       ]);
     })
     .then(() => {
@@ -124,7 +130,7 @@ exports.seed = function (knex) {
           account_id: 1,
         },
         {
-          item_id: 1,
+          item_id: 4,
           weight: 50,
           created: '2022-01-31',
           last_edit: '2022-01-31',
@@ -132,27 +138,11 @@ exports.seed = function (knex) {
           account_id: 1,
         },
         {
-          item_id: 2,
+          item_id: 5,
           weight: 20,
           created: '2022-02-01',
           last_edit: '2022-02-01',
           source_id: 3,
-          account_id: 2,
-        },
-        {
-          item_id: 2,
-          weight: 40,
-          created: '2022-02-01',
-          last_edit: '2022-02-01',
-          source_id: 1,
-          account_id: 2,
-        },
-        {
-          item_id: 4,
-          weight: 40,
-          created: '2022-02-01',
-          last_edit: '2022-02-01',
-          source_id: 1,
           account_id: 2,
         },
       ]);
