@@ -148,6 +148,14 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function addItem(newItem, accountId) {
+    const sqlQuery = `INSERT INTO item (name, account_id)
+    VALUES ($1, $2);`;
+    const result = await client.query(sqlQuery, [ newItem.name, accountId 
+    ]);
+    return result.rows;
+  }
+
   async function getListOfEntries(authId, callback) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
@@ -227,5 +235,6 @@ module.exports = async function () {
     addAccount,
     updateSource,
     updateItem,
+    addItem,
   };
 };
