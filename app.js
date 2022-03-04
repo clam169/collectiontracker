@@ -151,8 +151,22 @@ module.exports = function (database) {
   });
 
   // TODO: post request to input data. Just validates for now
-  app.post('/api/items', checkAuth, async (req, res, next) => {
-    res.send(`New item to be added`);
+  app.post('/api/items', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const newItem = req.body.data;
+    console.log('newItem: ', newItem);
+    console.log('authId: ', authId);
+    try {
+      const account = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', account);
+      await database.addItem(newItem, account.account_id);
+      res.send({
+        msg: 'New Item added successfully',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   /** Entry Routes **/
