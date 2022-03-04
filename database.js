@@ -223,6 +223,7 @@ module.exports = async function () {
     getSources,
     addSource,
     getItems,
+    getItemsByDateRange,
     getListOfEntries,
     deleteEntry,
     updateEntryById,
