@@ -199,6 +199,25 @@ module.exports = function (database) {
     }
   });
 
+  app.get('/api/entries/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getEntriesByDateRange(
+        startDate,
+        endDate,
+        authId
+      );
+      console.log('resuuuuuuult entires dates ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   //updates an entry with new data
   app.put('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;

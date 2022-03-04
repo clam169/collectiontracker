@@ -171,6 +171,22 @@ module.exports = async function () {
     return result.rows;
   }
 
+  async function getEntriesByDateRange(startDate, endDate, authId) {
+    let sqlQuery = `SELECT item.name AS item_name, item.item_id,
+    source.name AS source_name, source.source_id, entry_id,
+    TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+	  AND entry.created BETWEEN $2 AND $3
+    ORDER by CREATED desc, entry_id desc;`;
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    return result.rows;
+  }
+
   async function getEntryById(entryId, callback) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
@@ -227,6 +243,7 @@ module.exports = async function () {
     getSources,
     addSource,
     getItems,
+    getEntriesByDateRange,
     getListOfEntries,
     deleteEntry,
     updateEntryById,
