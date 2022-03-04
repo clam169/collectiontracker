@@ -129,25 +129,21 @@ module.exports = async function () {
   }
 
   async function getItems(authId) {
-    let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
-      JOIN item ON account_item.item_id = item.item_id
-      JOIN account ON account_item.account_id = account.account_id
+    let sqlQuery = `SELECT name, item_id FROM item
+      JOIN account ON item.account_id = account.account_id
       WHERE account.auth0_id = $1;`;
     //   WHERE account_item.account_id = $1;`;
     // client.query(sqlQuery, [accountId], (err, result) => {
     const result = await client.query(sqlQuery, [authId]);
-
     return result.rows;
   }
 
-  async function getItemsByDateRange(startDate, endDate, authId) {
-    let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
-      JOIN item ON account_item.item_id = item.item_id
-      JOIN account ON account_item.account_id = account.account_id
-      WHERE account.auth0_id = $1;`;
-    //   WHERE account_item.account_id = $1;`;
-    // client.query(sqlQuery, [accountId], (err, result) => {
-    const result = await client.query(sqlQuery, [authId]);
+  async function updateItem(itemId, postData) {
+    let sqlQuery = `UPDATE item SET name = $1
+      WHERE item_id = $2`;
+    let params = [postData.name, itemId];
+
+    const result = await client.query(sqlQuery, params);
 
     return result.rows;
   }
@@ -163,6 +159,22 @@ module.exports = async function () {
     WHERE account.auth0_id = $1
     ORDER by CREATED desc, entry_id desc;`;
     const result = await client.query(sqlQuery, [authId]);
+
+    return result.rows;
+  }
+
+  async function getEntriesByDateRange(startDate, endDate, authId) {
+    let sqlQuery = `SELECT item.name AS item_name, item.item_id,
+    source.name AS source_name, source.source_id, entry_id,
+    TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+	  AND entry.created BETWEEN $2 AND $3
+    ORDER by CREATED desc, entry_id desc;`;
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
 
     return result.rows;
   }
@@ -223,7 +235,7 @@ module.exports = async function () {
     getSources,
     addSource,
     getItems,
-    getItemsByDateRange,
+    getEntriesByDateRange,
     getListOfEntries,
     deleteEntry,
     updateEntryById,
@@ -231,5 +243,6 @@ module.exports = async function () {
     findAccount,
     addAccount,
     updateSource,
+    updateItem,
   };
 };

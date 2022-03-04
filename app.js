@@ -136,19 +136,14 @@ module.exports = function (database) {
     }
   });
 
-  app.get('/api/items/:startDate/:endDate', checkAuth, async (req, res) => {
-    const authId = req.oidc?.user?.sub;
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
-
+  app.put('/api/items/:id', async (req, res) => {
+    const itemId = req.params.id;
+    const itemEdit = req.body.data;
     try {
-      let result = await database.getItemsByDateRange(
-        startDate,
-        endDate,
-        authId
-      );
-      console.log('resuuuuuuult items ', result);
-      res.send(result);
+      await database.updateItem(itemId, itemEdit);
+      res.send({
+        msg: 'item has been updated',
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error });
@@ -184,6 +179,25 @@ module.exports = function (database) {
       let result = await database.getEntryById(entryId);
       console.log('resuuuuuuult entry by Id ', result);
       res.send(result[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
+  app.get('/api/entries/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getEntriesByDateRange(
+        startDate,
+        endDate,
+        authId
+      );
+      console.log('resuuuuuuult entires dates ', result);
+      res.send(result);
     } catch (error) {
       console.error(error);
       res.status(500).send({ error });
