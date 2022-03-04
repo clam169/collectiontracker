@@ -151,12 +151,12 @@ module.exports = async function () {
   async function addItem(newItem, accountId) {
     const sqlQuery = `INSERT INTO item (name, account_id)
     VALUES ($1, $2);`;
-    const result = await client.query(sqlQuery, [ newItem.name, accountId 
+    const result = await client.query(sqlQuery, [ newItem.name, accountId
     ]);
     return result.rows;
   }
 
-  async function getListOfEntries(authId, callback) {
+  async function getListOfEntries(authId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
