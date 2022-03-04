@@ -136,6 +136,20 @@ module.exports = function (database) {
     }
   });
 
+  app.put('/api/items/:id', async (req, res) => {
+    const itemId = req.params.id;
+    const itemEdit = req.body.data;
+    try {
+      await database.updateItem(itemId, itemEdit);
+      res.send({
+        msg: 'item has been updated',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   // TODO: post request to input data. Just validates for now
   app.post('/api/items', checkAuth, async (req, res, next) => {
     res.send(`New item to be added`);
