@@ -218,6 +218,23 @@ module.exports = function (database) {
     }
   });
 
+  /** Totals Routes **/
+  // get the total
+  app.get('/api/totals/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getTotalWeights(startDate, endDate, authId);
+      console.log('resuuuuuuult totals by source: ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   //updates an entry with new data
   app.put('/api/entries/:id', checkAuth, async (req, res) => {
     const entryId = req.params.id;

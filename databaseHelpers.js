@@ -41,4 +41,29 @@ const sourceSqlValues = (sourceObject) => {
 const camelToSnakeCase = (str) =>
   str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
-module.exports = { sqlValues, sourceSqlValues };
+const transformTotalWeightsData = (rows) => {
+  let outputArray = [];
+  for (let row of rows) {
+    // iterate across rows from DB
+    // destructure DB row
+    let { sourceName, itemName, totalWeight } = row;
+    // finds the output object in outputArray, or else finds null
+    let outputObject = null;
+    for (let oo of outputArray) {
+      if (oo.source === sourceName) {
+        outputObject = oo;
+      }
+    }
+    // aw shitcrap, we didn't find it.  better make it.
+    if (outputObject === null) {
+      outputObject = { source: sourceName, totals: [] };
+      // it's made.  now make sure it's healthy in its healthy home
+      outputArray.push(outputObject);
+    }
+    // anyway, let's add the item and totalWeight into a new object in the `totals` array
+    outputObject.totals.push({ item: itemName, totalWeight });
+  }
+  return outputArray;
+};
+
+module.exports = { sqlValues, sourceSqlValues, transformTotalWeightsData };

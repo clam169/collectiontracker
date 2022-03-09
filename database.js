@@ -1,6 +1,10 @@
 const { Pool } = require('pg');
 
-const { sqlValues, sourceSqlValues } = require('./databaseHelpers');
+const {
+  sqlValues,
+  sourceSqlValues,
+  transformTotalWeightsData,
+} = require('./databaseHelpers');
 
 const pool = new Pool({
   host: process.env.PG_HOST,
@@ -151,12 +155,11 @@ module.exports = async function () {
   async function addItem(newItem, accountId) {
     const sqlQuery = `INSERT INTO item (name, account_id)
     VALUES ($1, $2);`;
-    const result = await client.query(sqlQuery, [ newItem.name, accountId 
-    ]);
+    const result = await client.query(sqlQuery, [newItem.name, accountId]);
     return result.rows;
   }
 
-  async function getListOfEntries(authId, callback) {
+  async function getListOfEntries(authId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
@@ -187,7 +190,32 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function getEntryById(entryId, callback) {
+  async function getTotalWeights(startDate, endDate, authId) {
+    let sqlQuery = `SELECT source.name AS "sourceName", item.name AS "itemName", SUM(entry.weight) AS "totalWeight"
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+    AND created BETWEEN $2 AND $3
+    GROUP BY source.name, item.name;`;
+
+    //   let sqlQuery = `SELECT source.name AS source_name, json_object_agg(item.name, entry.weight) AS totals
+    //   FROM entry
+    //   JOIN item ON entry.item_id = item.item_id
+    //   JOIN source ON entry.source_id = source.source_id
+    //   JOIN account ON entry.account_id = account.account_id
+    //   WHERE account.auth0_id = $1
+    //   AND created BETWEEN $2 AND $3
+    // GROUP BY source.name;`;
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    const newJson = transformTotalWeightsData(result.rows);
+
+    return newJson;
+  }
+
+  async function getEntryById(entryId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
@@ -203,7 +231,7 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function deleteEntry(entryId, callback) {
+  async function deleteEntry(entryId) {
     let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
     console.log(sqlQuery, '$1 is ', entryId);
     const result = await client.query(sqlQuery, [entryId]);
@@ -253,5 +281,6 @@ module.exports = async function () {
     updateSource,
     updateItem,
     addItem,
+    getTotalWeights,
   };
 };
