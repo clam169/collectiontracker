@@ -220,7 +220,7 @@ module.exports = function (database) {
 
   /** Totals Routes **/
   // get the total
-  app.get('/api/totals/:startDate/:endDate', async (req, res) => {
+  app.get('/api/totals/:startDate/:endDate', checkAuth, async (req, res) => {
     const authId = req.oidc?.user?.sub;
     const startDate = req.params.startDate;
     const endDate = req.params.endDate;
