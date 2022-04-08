@@ -4,6 +4,7 @@ const {
   sqlValues,
   sourceSqlValues,
   transformTotalWeightsData,
+  keysToCamel,
 } = require('./databaseHelpers');
 
 const pool = new Pool({
@@ -215,6 +216,26 @@ module.exports = async function () {
     return newJson;
   }
 
+  async function getGraphDataset(startDate, endDate, authId) {
+    let sqlQuery = `SELECT item.name AS item_name,
+    source.name AS source_name,
+    TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS date, SUM(weight) AS total_weight
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+	AND entry.created BETWEEN $2 AND $3
+	GROUP BY source.source_id, source.name, item.item_id, item.name, date
+    ORDER by date asc;`;
+
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    const camelResult = result.rows.map((row) => keysToCamel(row));
+
+    return camelResult;
+  }
+
   async function getEntryById(entryId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
@@ -282,5 +303,6 @@ module.exports = async function () {
     updateItem,
     addItem,
     getTotalWeights,
+    getGraphDataset,
   };
 };

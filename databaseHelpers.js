@@ -41,6 +41,37 @@ const sourceSqlValues = (sourceObject) => {
 const camelToSnakeCase = (str) =>
   str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
+// taken from https://matthiashager.com/converting-snake-case-to-camel-case-object-keys-with-javascript
+const toCamel = (s) => {
+  return s.replace(/([-_][a-z])/gi, ($1) => {
+    return $1.toUpperCase().replace('-', '').replace('_', '');
+  });
+};
+
+const keysToCamel = function (o) {
+  const isArray = function (o) {
+    return Array.isArray(o);
+  };
+  const isObject = function (o) {
+    return o === Object(o) && !isArray(o) && typeof o !== 'function';
+  };
+  if (isObject(o)) {
+    const n = {};
+
+    Object.keys(o).forEach((k) => {
+      n[toCamel(k)] = keysToCamel(o[k]);
+    });
+
+    return n;
+  } else if (isArray(o)) {
+    return o.map((i) => {
+      return keysToCamel(i);
+    });
+  }
+
+  return o;
+};
+
 const transformTotalWeightsData = (rows) => {
   let outputArray = [];
   for (let row of rows) {
@@ -66,4 +97,9 @@ const transformTotalWeightsData = (rows) => {
   return outputArray;
 };
 
-module.exports = { sqlValues, sourceSqlValues, transformTotalWeightsData };
+module.exports = {
+  sqlValues,
+  sourceSqlValues,
+  keysToCamel,
+  transformTotalWeightsData,
+};
