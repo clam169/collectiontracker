@@ -281,9 +281,9 @@ module.exports = function (database) {
   });
 
   /** Graph routes **/
-  app.get('/api/graph/line/:startDate/:endDate', async (req, res) => {
-    // const authId = req.oidc?.user?.sub;
-    const authId = 'auth0|62070daf94fb2700687ca3b3';
+  app.get('/api/graph/line/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    // const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
     const startDate = req.params.startDate;
     const endDate = req.params.endDate;
 
