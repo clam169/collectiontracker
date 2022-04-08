@@ -1,6 +1,11 @@
 const { Pool } = require('pg');
 
-const { sqlValues, sourceSqlValues } = require('./databaseHelpers');
+const {
+  sqlValues,
+  sourceSqlValues,
+  transformTotalWeightsData,
+  keysToCamel,
+} = require('./databaseHelpers');
 
 const pool = new Pool({
   host: process.env.PG_HOST,
@@ -129,18 +134,33 @@ module.exports = async function () {
   }
 
   async function getItems(authId) {
-    let sqlQuery = `SELECT account_item.item_id, name FROM public.account_item
-      JOIN item ON account_item.item_id = item.item_id
-      JOIN account ON account_item.account_id = account.account_id
+    let sqlQuery = `SELECT name, item_id FROM item
+      JOIN account ON item.account_id = account.account_id
       WHERE account.auth0_id = $1;`;
     //   WHERE account_item.account_id = $1;`;
     // client.query(sqlQuery, [accountId], (err, result) => {
     const result = await client.query(sqlQuery, [authId]);
+    return result.rows;
+  }
+
+  async function updateItem(itemId, postData) {
+    let sqlQuery = `UPDATE item SET name = $1
+      WHERE item_id = $2`;
+    let params = [postData.name, itemId];
+
+    const result = await client.query(sqlQuery, params);
 
     return result.rows;
   }
 
-  async function getListOfEntries(authId, callback) {
+  async function addItem(newItem, accountId) {
+    const sqlQuery = `INSERT INTO item (name, account_id)
+    VALUES ($1, $2);`;
+    const result = await client.query(sqlQuery, [newItem.name, accountId]);
+    return result.rows;
+  }
+
+  async function getListOfEntries(authId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
@@ -155,7 +175,68 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function getEntryById(entryId, callback) {
+  async function getEntriesByDateRange(startDate, endDate, authId) {
+    let sqlQuery = `SELECT item.name AS item_name, item.item_id,
+    source.name AS source_name, source.source_id, entry_id,
+    TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+	  AND entry.created BETWEEN $2 AND $3
+    ORDER by CREATED desc, entry_id desc;`;
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    return result.rows;
+  }
+
+  async function getTotalWeights(startDate, endDate, authId) {
+    let sqlQuery = `SELECT source.name AS "sourceName", item.name AS "itemName", SUM(entry.weight) AS "totalWeight"
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+    AND created BETWEEN $2 AND $3
+    GROUP BY source.name, item.name;`;
+
+    //   let sqlQuery = `SELECT source.name AS source_name, json_object_agg(item.name, entry.weight) AS totals
+    //   FROM entry
+    //   JOIN item ON entry.item_id = item.item_id
+    //   JOIN source ON entry.source_id = source.source_id
+    //   JOIN account ON entry.account_id = account.account_id
+    //   WHERE account.auth0_id = $1
+    //   AND created BETWEEN $2 AND $3
+    // GROUP BY source.name;`;
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    const newJson = transformTotalWeightsData(result.rows);
+
+    return newJson;
+  }
+
+  async function getGraphDataset(startDate, endDate, authId) {
+    let sqlQuery = `SELECT item.name AS item_name,
+    source.name AS source_name,
+    TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS date, SUM(weight) AS total_weight
+    FROM entry
+    JOIN item ON entry.item_id = item.item_id
+    JOIN source ON entry.source_id = source.source_id
+    JOIN account ON entry.account_id = account.account_id
+    WHERE account.auth0_id = $1
+	AND entry.created BETWEEN $2 AND $3
+	GROUP BY source.source_id, source.name, item.item_id, item.name, date
+    ORDER by date asc;`;
+
+    const result = await client.query(sqlQuery, [authId, startDate, endDate]);
+
+    const camelResult = result.rows.map((row) => keysToCamel(row));
+
+    return camelResult;
+  }
+
+  async function getEntryById(entryId) {
     let sqlQuery = `SELECT item.name AS item_name, item.item_id,
     source.name AS source_name, source.source_id, entry_id,
     TO_CHAR(created :: DATE, 'yyyy-mm-dd') AS entry_date, weight AS entry_weight
@@ -171,7 +252,7 @@ module.exports = async function () {
     return result.rows;
   }
 
-  async function deleteEntry(entryId, callback) {
+  async function deleteEntry(entryId) {
     let sqlQuery = `DELETE FROM entry WHERE entry_id = $1;`;
     console.log(sqlQuery, '$1 is ', entryId);
     const result = await client.query(sqlQuery, [entryId]);
@@ -211,6 +292,7 @@ module.exports = async function () {
     getSources,
     addSource,
     getItems,
+    getEntriesByDateRange,
     getListOfEntries,
     deleteEntry,
     updateEntryById,
@@ -218,5 +300,9 @@ module.exports = async function () {
     findAccount,
     addAccount,
     updateSource,
+    updateItem,
+    addItem,
+    getTotalWeights,
+    getGraphDataset,
   };
 };

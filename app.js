@@ -136,9 +136,37 @@ module.exports = function (database) {
     }
   });
 
+  app.put('/api/items/:id', async (req, res) => {
+    const itemId = req.params.id;
+    const itemEdit = req.body.data;
+    try {
+      await database.updateItem(itemId, itemEdit);
+      res.send({
+        msg: 'item has been updated',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
   // TODO: post request to input data. Just validates for now
-  app.post('/api/items', checkAuth, async (req, res, next) => {
-    res.send(`New item to be added`);
+  app.post('/api/items', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const newItem = req.body.data;
+    console.log('newItem: ', newItem);
+    console.log('authId: ', authId);
+    try {
+      const account = await database.findAccount(authId);
+      console.log('ACCCOCUNT ID', account);
+      await database.addItem(newItem, account.account_id);
+      res.send({
+        msg: 'New Item added successfully',
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
   });
 
   /** Entry Routes **/
@@ -165,6 +193,42 @@ module.exports = function (database) {
       let result = await database.getEntryById(entryId);
       console.log('resuuuuuuult entry by Id ', result);
       res.send(result[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
+  app.get('/api/entries/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getEntriesByDateRange(
+        startDate,
+        endDate,
+        authId
+      );
+      console.log('resuuuuuuult entires dates ', result);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
+
+  /** Totals Routes **/
+  // get the total
+  app.get('/api/totals/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getTotalWeights(startDate, endDate, authId);
+      console.log('resuuuuuuult totals by source: ', result);
+      res.send(result);
     } catch (error) {
       console.error(error);
       res.status(500).send({ error });
@@ -216,21 +280,21 @@ module.exports = function (database) {
     }
   });
 
-  // app.get(
-  //   '/api/graph/',
-  //   async(req, (res) => {
-  //     const accountId = 1;
-  //     try {
-  //       const stuffThatGraphLibraryNeeds = await database.SOMETHING(
-  //         accountId
-  //       );
-  //       res.send({});
-  //     } catch (error) {
-  //       console.error(error);
-  //       res.status(500).send({ error });
-  //     }
-  //   })
-  // );
+  /** Graph routes **/
+  app.get('/api/graph/line/:startDate/:endDate', checkAuth, async (req, res) => {
+    const authId = req.oidc?.user?.sub;
+    // const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    try {
+      let result = await database.getGraphDataset(startDate, endDate, authId);
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error });
+    }
+  });
 
   /** Render pages **/
   // anything that hasn't been serverd through a route should be served by the react app
