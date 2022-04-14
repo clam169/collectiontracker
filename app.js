@@ -7,6 +7,7 @@ const { auth } = require('express-openid-connect');
 const jwt_decode = require('jwt-decode');
 
 const authConfig = require('./auth');
+const { generateDataset, filterEntriesBySource } = require('./chartHelpers');
 
 module.exports = function (database) {
   const app = express();
@@ -281,15 +282,26 @@ module.exports = function (database) {
   });
 
   /** Graph routes **/
-  app.get('/api/graph/line/:startDate/:endDate', checkAuth, async (req, res) => {
-    const authId = req.oidc?.user?.sub;
-    // const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
+  app.get('/api/graph/line/:startDate/:endDate', async (req, res) => {
+    console.log("get graph routes is called :)")
+    // const authId = req.oidc?.user?.sub;
+    const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
     const startDate = req.params.startDate;
     const endDate = req.params.endDate;
 
+    let dataset = {}
     try {
       let result = await database.getGraphDataset(startDate, endDate, authId);
-      res.send(result);
+      let sorted = filterEntriesBySource(result);
+      console.log('SORTED RESULTS: ', sorted)
+      // for each sorted key value
+      for (const source in sorted) {
+        let something = generateDataset(sorted[source], startDate, endDate)
+        dataset[source] = (something);
+      }
+      // call generate dataset and save it to an master array
+      // let dataset = generateDataset(sorted, startDate, endDate);
+      res.send(dataset);
     } catch (error) {
       console.error(error);
       res.status(500).send({ error });
