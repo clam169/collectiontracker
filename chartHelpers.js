@@ -9,7 +9,7 @@ const generateXAxis = (startDate, endDate) => {
     start = new Date(start.setDate(start.getDate() + 1));
     XAxisArray.push(dateToYMD(start));
   } while (dateToYMD(start) != dateToYMD(end));
-  console.log(XAxisArray);
+  console.log('xaxisarray is', XAxisArray);
   return XAxisArray;
 };
 
@@ -31,7 +31,6 @@ const colours = [
   'rgba(153, 102, 255, 0.7)',
   'rgba(255, 159, 64, 0.7)',
 ];
-
 
 /******
 // Things to do to make a dataset that looks like this for EVERY SOURCE:
@@ -59,7 +58,6 @@ Graph component needs: label, data, rgba colour.
 
 ****/
 const generateDataset = (input, startDate, endDate) => {
-
   let datesArray = generateXAxis(startDate, endDate);
 
   if (input.length === 0) {
@@ -68,28 +66,26 @@ const generateDataset = (input, startDate, endDate) => {
 
   let items = [];
 
-
   input.forEach((entry) => {
-      let item = items.find((item) => item.itemName === entry.itemName);
-      if (item) {
-        item.data.push(Number(entry.totalWeight));
-        item.date.push(entry.date);
-      } else {
-        items.push({
-          itemName: entry.itemName,
-          data: [Number(entry.totalWeight)],
-          date: [entry.date],
-        });
-      }
-    });
-
-
-
+    let item = items.find((item) => item.itemName === entry.itemName);
+    if (item) {
+      item.data.push(Number(entry.totalWeight));
+      item.date.push(entry.date);
+    } else {
+      items.push({
+        itemName: entry.itemName,
+        data: [Number(entry.totalWeight)],
+        date: [entry.date],
+      });
+    }
+  });
 
   let structure = [];
 
   items.forEach((item) => {
-    console.log(`i am the end product of the ugly for loop. items: ${item.data}`)
+    console.log(
+      `i am the end product of the ugly for loop. items: ${item.data}`
+    );
     let structureData = [];
     let structureDate = [];
     datesArray.forEach((date, i) => {
@@ -108,12 +104,12 @@ const generateDataset = (input, startDate, endDate) => {
     item.data = structureData;
   });
 
-  items.forEach((item) => {
+  items.forEach((item, index) => {
     structure.push({
       label: item.itemName, // item name
       data: item.data, // weights
-      borderColor: 'rgb(53, 162, 235)',
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      borderColor: colours[index],
+      backgroundColor: colours[index],
     });
   });
 
@@ -185,9 +181,7 @@ const filterEntriesBySource = (input) => {
       ];
     }
   });
- console.log(
-   'SOURCES: ', sources
- )
+  console.log('SOURCES: ', sources);
   return sources;
 };
 
