@@ -282,32 +282,35 @@ module.exports = function (database) {
   });
 
   /** Graph routes **/
-  app.get('/api/graph/line/:startDate/:endDate', async (req, res) => {
-    console.log('get graph routes is called :)');
-    // const authId = req.oidc?.user?.sub;
-    const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
+  app.get(
+    '/api/graph/line/:startDate/:endDate',
+    checkAuth, async (req, res) => {
+      console.log('get graph routes is called :)');
+      const authId = req.oidc?.user?.sub;
+      // const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
+      const startDate = req.params.startDate;
+      const endDate = req.params.endDate;
 
-    let dataset = {};
-    try {
-      let result = await database.getGraphDataset(startDate, endDate, authId);
-      let sorted = filterEntriesBySource(result);
-      console.log('SORTED RESULTS: ', sorted);
-      // for each sorted key value
-      for (const source in sorted) {
-        let something = generateDataset(sorted[source], startDate, endDate);
-        dataset[source] = something;
+      let dataset = {};
+      try {
+        let result = await database.getGraphDataset(startDate, endDate, authId);
+        let sorted = filterEntriesBySource(result);
+        console.log('SORTED RESULTS: ', sorted);
+        // for each sorted key value
+        for (const source in sorted) {
+          let something = generateDataset(sorted[source], startDate, endDate);
+          dataset[source] = something;
+        }
+        // call generate dataset and save it to an master array
+        // let dataset = generateDataset(sorted, startDate, endDate);
+        res.send(dataset);
+        console.log('dataset is???', dataset);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ error });
       }
-      // call generate dataset and save it to an master array
-      // let dataset = generateDataset(sorted, startDate, endDate);
-      res.send(dataset);
-      console.log('dataset is???', dataset);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ error });
     }
-  });
+  );
 
   /** Render pages **/
   // anything that hasn't been serverd through a route should be served by the react app
