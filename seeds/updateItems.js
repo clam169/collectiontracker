@@ -60,7 +60,7 @@ exports.seed = function (knex) {
           name: 'Coffee Chaffs',
           account_id: 1,
         },
-                {
+        {
           name: 'Paper Cups',
           account_id: 3,
         },
@@ -106,20 +106,36 @@ exports.seed = function (knex) {
           phone_number: null,
           account_id: 1,
         },
+        {
+          name: 'Coffee Shop 1',
+          address: '123 ABC Street, Vancouver, BC',
+          phone_number: 6045555555,
+          account_id: 3,
+        },
+        {
+          name: 'Coffee Shop 2',
+          address: '456 EFG Street, Vancouver, BC',
+          phone_number: 6040000000,
+          account_id: 3,
+        },
+        {
+          name: 'Coffee Shop 3',
+          address: '789 whatever street, van, bc',
+          phone_number: null,
+          account_id: 3,
+        },
       ]);
     })
     .then(() => {
       return knex('cx_source').insert([
         { source_id: 1, cx_account_id: 1 },
         { source_id: 2, cx_account_id: 1 },
-                { source_id: 3, cx_account_id: 2 },
+        { source_id: 3, cx_account_id: 2 },
 
         { source_id: 3, cx_account_id: 2 },
         { source_id: 1, cx_account_id: 2 },
-        { source_id: 1, cx_account_id: 3 },
-                        { source_id: 2, cx_account_id: 3 },
-
-
+        { source_id: 4, cx_account_id: 3 },
+        { source_id: 5, cx_account_id: 3 },
       ]);
     })
     .then(() => {
@@ -172,7 +188,7 @@ exports.seed = function (knex) {
           weight: 20,
           created: '2022-04-01',
           last_edit: '2022-04-01',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -180,7 +196,7 @@ exports.seed = function (knex) {
           weight: 10,
           created: '2022-04-01',
           last_edit: '2022-04-01',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -188,7 +204,7 @@ exports.seed = function (knex) {
           weight: 9,
           created: '2022-04-01',
           last_edit: '2022-04-01',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -196,7 +212,7 @@ exports.seed = function (knex) {
           weight: 13,
           created: '2022-04-08',
           last_edit: '2022-04-08',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -204,7 +220,7 @@ exports.seed = function (knex) {
           weight: 4,
           created: '2022-04-08',
           last_edit: '2022-04-08',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -212,7 +228,7 @@ exports.seed = function (knex) {
           weight: 14,
           created: '2022-04-08',
           last_edit: '2022-04-08',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -220,7 +236,7 @@ exports.seed = function (knex) {
           weight: 14,
           created: '2022-04-15',
           last_edit: '2022-04-15',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -228,7 +244,7 @@ exports.seed = function (knex) {
           weight: 18,
           created: '2022-04-15',
           last_edit: '2022-04-15',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
         {
@@ -236,15 +252,15 @@ exports.seed = function (knex) {
           weight: 20,
           created: '2022-04-15',
           last_edit: '2022-04-15',
-          source_id: 1,
+          source_id: 4,
           account_id: 3,
         },
-                {
+        {
           item_id: 4,
           weight: 1,
           created: '2022-04-05',
           last_edit: '2022-04-05',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -252,7 +268,7 @@ exports.seed = function (knex) {
           weight: 3,
           created: '2022-04-05',
           last_edit: '2022-04-05',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -260,15 +276,15 @@ exports.seed = function (knex) {
           weight: 15,
           created: '2022-04-05',
           last_edit: '2022-04-05',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
-                        {
+        {
           item_id: 4,
           weight: 3,
           created: '2022-04-12',
           last_edit: '2022-04-12',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -276,7 +292,7 @@ exports.seed = function (knex) {
           weight: 23,
           created: '2022-04-12',
           last_edit: '2022-04-12',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -284,15 +300,15 @@ exports.seed = function (knex) {
           weight: 2,
           created: '2022-04-12',
           last_edit: '2022-04-12',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
-                        {
+        {
           item_id: 4,
           weight: 12,
           created: '2022-04-19',
           last_edit: '2022-04-19',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -300,7 +316,7 @@ exports.seed = function (knex) {
           weight: 4,
           created: '2022-04-19',
           last_edit: '2022-04-19',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
         {
@@ -308,7 +324,7 @@ exports.seed = function (knex) {
           weight: 10,
           created: '2022-04-19',
           last_edit: '2022-04-19',
-          source_id: 2,
+          source_id: 5,
           account_id: 3,
         },
       ]);
