@@ -44,8 +44,6 @@ module.exports = function (database) {
 
   app.use(auth(authConfig));
 
-  // serve the react app if request to /
-  app.use(express.static(path.join(__dirname, 'build')));
 
   /** Test Route **/
   const authId = 'auth';
@@ -284,7 +282,8 @@ module.exports = function (database) {
   /** Graph routes **/
   app.get(
     '/api/graph/line/:startDate/:endDate',
-    checkAuth, async (req, res) => {
+    checkAuth,
+    async (req, res) => {
       console.log('get graph routes is called :)');
       const authId = req.oidc?.user?.sub;
       // const authId = 'auth0|62070daf94fb2700687ca3b3'; // pinky
@@ -315,9 +314,19 @@ module.exports = function (database) {
   /** Render pages **/
   // anything that hasn't been serverd through a route should be served by the react app
   // /idk/someroute/longroute
-  app.get('*', (req, res) => {
+  app.get('/', checkAuth, (req, res) => {
+    // res.redirect('/login');
     res.sendFile(path.join(__dirname, '/build/index.html'));
   });
+
+  // serve the react app if request to /
+  app.use(express.static(path.join(__dirname, 'build')));
+
+  app.get('*', checkAuth, (req, res) => {
+    // res.redirect('/login');
+    res.sendFile(path.join(__dirname, '/build/index.html'));
+  });
+
 
   ///////////////////////// Just realized that we might not use routes ----> We can refactor later, added header comments for now
   //   //Routes
