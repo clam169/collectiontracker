@@ -23,7 +23,7 @@
 </div>
 
 <blockquote>
-<a href="https://collectiontrackerapp.herokuapp.com">View Demo</a>
+<a href="https://collectiontrackerapp.herokuapp.com" target="_blank">View Demo</a>
 <br />
 To view the demo account login with the following credentials:
 <br />
@@ -45,7 +45,6 @@ Password: Gates123!</blockquote>
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
@@ -133,7 +132,7 @@ Octavio Villena - [LinkedIn](https://www.linkedin.com/in/octavio-villena/) - [Gi
 
 <!-- Designers -->
 #### Designed By
-[Alicia Yien](https://www.linkedin.com/in/aliciayien/), [Jessica Wu](https://www.linkedin.com/in/jessicawu-/), [Min Chun](https://www.linkedin.com/in/hoonminchun/), and [Catherine Lam](https://www.linkedin.com/in/catherinelamyw/)
+[Alicia Yien](https://www.linkedin.com/in/aliciayien/), [Jessica Wu](https://www.linkedin.com/in/jessicawu-/), and [Min Chun](https://www.linkedin.com/in/hoonminchun/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
