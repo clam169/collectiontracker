@@ -15,7 +15,7 @@ exports.seed = function (knex) {
           nickname: 'pinky',
           email: 'pinky@powpow.com',
           account_type_id: 1,
-          auth0_id: 'auth0|6297fb995838380069abf046',
+          auth0_id: 'auth0|6297fc2ddc4dea0068d81f05',
         },
         {
           given_name: 'Black',
