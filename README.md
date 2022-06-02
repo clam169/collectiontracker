@@ -90,7 +90,7 @@ __*example*__<br>
 An individual collecting textiles from various donors in order to repurpose or sell the material could track where those materials are coming from and how often items come from a donor.
 
 <img src="./images/viewEntries.png">
-<br /><br />
+<br />
 <img src="./images/viewGraph.png">
 
 
